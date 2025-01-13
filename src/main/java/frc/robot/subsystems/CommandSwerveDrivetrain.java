@@ -2,7 +2,10 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.util.Optional;
 import java.util.function.Supplier;
+
+import org.photonvision.PhotonCamera;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
@@ -15,8 +18,14 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -30,7 +39,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-
+import frc.robot.Constants;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 
 /**
@@ -59,6 +68,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private final SwerveRequest.SysIdSwerveRotation m_rotationCharacterization = new SwerveRequest.SysIdSwerveRotation();
 
     public static final Field2d _field = new Field2d();
+    private AprilTagFieldLayout layout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+    private PhotonCamera cam = Constants.PhotonVisionConstants.m_Camera;
 
     /* SysId routine for characterizing translation. This is used to find PID gains for the drive motors. */
     private final SysIdRoutine m_sysIdRoutineTranslation = new SysIdRoutine(
@@ -289,6 +300,26 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         SmartDashboard.putNumber("Pose X", getState().Pose.getX());
         SmartDashboard.putNumber("Pose Y", getState().Pose.getY());
         _field.setRobotPose(getState().Pose.getX(), getState().Pose.getY(), getState().Pose.getRotation());
+
+        //VISION
+        var results = cam.getAllUnreadResults();
+        var timestamp = Utils.getCurrentTimeSeconds();
+
+        if(!results.isEmpty()){
+            var cur = results.get(results.size() - 1);
+            var best = cur.getBestTarget();
+            var bestID = best.getFiducialId();
+
+            Optional<Pose3d> tagPose = layout.getTagPose(bestID);
+            if(best.getPoseAmbiguity() <= 0.2 && bestID >= 0 && tagPose.isPresent()){
+                var targetPose = tagPose.get();
+                Transform3d camToTarget = best.getBestCameraToTarget();
+                Pose3d camPose = targetPose.transformBy(camToTarget.inverse());
+
+                var visionMeasure = camPose.transformBy(Constants.PhotonVisionConstants.CAMERA_TO_ROBOT);
+                addVisionMeasurement(visionMeasure.toPose2d(), timestamp);
+            }
+        }
     }
 
     private void startSimThread() {
