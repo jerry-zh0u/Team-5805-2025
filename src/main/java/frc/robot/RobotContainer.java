@@ -52,6 +52,8 @@ public class RobotContainer {
             )
         );
 
+        joystick.rightBumper().whileTrue(drivetrain.applyRequest(() -> drivetrain.CameraGoToTag(-joystick.getLeftY() * MaxSpeed, -joystick.getLeftX() * MaxSpeed, -joystick.getRightX() * MaxAngularRate, drive)));
+
         joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
         joystick.b().whileTrue(drivetrain.applyRequest(() ->
             point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))

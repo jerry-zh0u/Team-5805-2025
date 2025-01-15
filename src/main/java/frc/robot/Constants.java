@@ -12,17 +12,20 @@ import frc.robot.generated.TunerConstants;
 
 public final class Constants{
     public static class PhotonVisionConstants{
-        public static PhotonCamera m_Camera = new PhotonCamera("April");
+        public static PhotonCamera m_Camera = new PhotonCamera("HD_Pro_Webcam_C920");
 
-       // Constants such as camera and target height stored. Change per robot and goal!
-        public static final double CAMERA_HEIGHT_METERS = Units.inchesToMeters(24);
-        public static final double TARGET_HEIGHT_METERS = Units.feetToMeters(4.8);
+        //DESIRED CONSTANTS IN METERS FIXME
+        public static final double DES_REEF_DISTANCE = 0.05;
+        public static final double DES_HUMAN_DISTANCE = 0.05;
+        public static final double DES_ANGLE = 0;
 
-        // Angle between horizontal and the camera.
-        public static final double CAMERA_PITCH_RADIANS = Units.degreesToRadians(47);
+        public static final double CAMERA_HEIGHT = 0; //FIXME
+        public static final double CAMERA_ANGLE = 0.785398;
+        
+        //APRILTAGS
+        public static final double APRILTAG_7_HEIGHT = 0; //FIXME
 
         // How far from the target we want to be
-        public static final double GOAL_RANGE_METERS = Units.feetToMeters(8);
-        public static final Transform3d CAMERA_TO_ROBOT = new Transform3d(new Translation3d(null, null, null), new Rotation3d()); //FIXME
+        public static final Transform3d CAMERA_TO_ROBOT = new Transform3d(new Translation3d(0, -0.375, -0.0762), new Rotation3d(0, 0, CAMERA_ANGLE)); //FIXME
     }
 }

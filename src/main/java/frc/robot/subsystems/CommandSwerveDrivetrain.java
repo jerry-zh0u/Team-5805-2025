@@ -6,9 +6,13 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonUtils;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.mechanisms.swerve.LegacySwerveRequest.FieldCentric;
+import com.ctre.phoenix6.mechanisms.swerve.LegacySwerveRequest.RobotCentric;
+import com.ctre.phoenix6.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -18,9 +22,11 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
+import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -28,6 +34,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -303,21 +310,32 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
         //VISION
         var results = cam.getAllUnreadResults();
-        var timestamp = Utils.getCurrentTimeSeconds();
-
+        // var timestamp = Utils.getCurrentTimeSeconds();
+        // System.err.println(results.size() + " ==========");
         if(!results.isEmpty()){
             var cur = results.get(results.size() - 1);
-            var best = cur.getBestTarget();
-            var bestID = best.getFiducialId();
+            if(cur.getMultiTagResult().estimatedPose.isPresent){
+                Transform3d fieldToCamera = cur.getMultiTagResult().estimatedPose.best;
 
-            Optional<Pose3d> tagPose = layout.getTagPose(bestID);
-            if(best.getPoseAmbiguity() <= 0.2 && bestID >= 0 && tagPose.isPresent()){
-                var targetPose = tagPose.get();
-                Transform3d camToTarget = best.getBestCameraToTarget();
                 Pose3d camPose = targetPose.transformBy(camToTarget.inverse());
 
                 var visionMeasure = camPose.transformBy(Constants.PhotonVisionConstants.CAMERA_TO_ROBOT);
-                addVisionMeasurement(visionMeasure.toPose2d(), timestamp);
+                addVisionMeasurement(visionMeasure.toPose2d(), Units.millisecondsToSeconds((double)timestamp/1000));
+            }
+            else if(cur.hasTargets()){
+                var timestamp = cur.metadata.captureTimestampMicros;
+                var best = cur.getBestTarget();
+                var bestID = best.getFiducialId();
+
+                Optional<Pose3d> tagPose = layout.getTagPose(bestID);
+                if(best.getPoseAmbiguity() <= 0.2 && bestID >= 0 && tagPose.isPresent()){
+                    var targetPose = tagPose.get();
+                    Transform3d camToTarget = best.getBestCameraToTarget();
+                    Pose3d camPose = targetPose.transformBy(camToTarget.inverse());
+
+                    var visionMeasure = camPose.transformBy(Constants.PhotonVisionConstants.CAMERA_TO_ROBOT);
+                    addVisionMeasurement(visionMeasure.toPose2d(), Units.millisecondsToSeconds((double)timestamp/1000));
+                }
             }
         }
     }
@@ -336,4 +354,35 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         });
         m_simNotifier.startPeriodic(kSimLoopPeriod);
     }
+    public SwerveRequest.FieldCentric CameraGoToTag(double forward, double strafe, double turn, SwerveRequest.FieldCentric drive){        
+        var results = cam.getAllUnreadResults();
+        PIDController pidControllerDrive = new PIDController(0.11, 0, 0.2);
+        PIDController pidControllerAngle = new  PIDController(0.11, 0, 0.00);
+
+        if(!results.isEmpty()){
+            var cur = results.get(results.size() - 1);
+            if(cur.hasTargets()){
+                for(var target : cur.getTargets()){
+                    if(target.getFiducialId() == 7){
+                        double curYaw = target.getYaw();
+                        double curDist = PhotonUtils.calculateDistanceToTargetMeters(
+                            Constants.PhotonVisionConstants.CAMERA_HEIGHT, 
+                            Constants.PhotonVisionConstants.APRILTAG_7_HEIGHT,
+                            Constants.PhotonVisionConstants.CAMERA_ANGLE, 
+                            Units.degreesToRadians(target.getPitch()));
+                        
+                        forward = pidControllerDrive.calculate(curDist, Constants.PhotonVisionConstants.DES_HUMAN_DISTANCE);
+                        turn = pidControllerAngle.calculate(curYaw, Constants.PhotonVisionConstants.DES_ANGLE);
+                    }
+                }
+            }
+        }
+
+        pidControllerDrive.close();
+        pidControllerAngle.close();
+
+        return drive.withVelocityX(forward)
+                    .withVelocityY(strafe)
+                    .withRotationalRate(turn);
+    }   
 }
