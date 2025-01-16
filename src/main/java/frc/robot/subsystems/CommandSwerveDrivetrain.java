@@ -5,8 +5,11 @@ import static edu.wpi.first.units.Units.*;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.targeting.PhotonPipelineResult;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
@@ -31,6 +34,8 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -48,6 +53,7 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
+import org.photonvision.PhotonPoseEstimator;
 
 /**
  * Class that extends the Phoenix 6 SwerveDrivetrain class and implements
@@ -77,6 +83,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public static final Field2d _field = new Field2d();
     private AprilTagFieldLayout layout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
     private PhotonCamera cam = Constants.PhotonVisionConstants.m_Camera;
+    private PhotonPoseEstimator camPoseEstimator = new PhotonPoseEstimator( layout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, Constants.PhotonVisionConstants.ROBOT_TO_CAMERA); // TODO Jerry, test different pose strageies. In general just use multitag
+
+    private static PhotonPipelineResult cur = null;
 
     /* SysId routine for characterizing translation. This is used to find PID gains for the drive motors. */
     private final SysIdRoutine m_sysIdRoutineTranslation = new SysIdRoutine(
@@ -313,29 +322,36 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         // var timestamp = Utils.getCurrentTimeSeconds();
         // System.err.println(results.size() + " ==========");
         if(!results.isEmpty()){
-            var cur = results.get(results.size() - 1);
-            if(cur.getMultiTagResult().estimatedPose.isPresent){
-                Transform3d fieldToCamera = cur.getMultiTagResult().estimatedPose.best;
+            cur = results.get(results.size() - 1);
 
-                Pose3d camPose = targetPose.transformBy(camToTarget.inverse());
+            // can potentially run through every result rather than just the most recent for more accurate representation of data
+            var photonEstimate = camPoseEstimator.update(cur).orElse(null);
+            if( photonEstimate != null)
+                addVisionMeasurement(photonEstimate.estimatedPose.toPose2d(), photonEstimate.timestampSeconds);
 
-                var visionMeasure = camPose.transformBy(Constants.PhotonVisionConstants.CAMERA_TO_ROBOT);
-                addVisionMeasurement(visionMeasure.toPose2d(), Units.millisecondsToSeconds((double)timestamp/1000));
-            }
-            else if(cur.hasTargets()){
-                var timestamp = cur.metadata.captureTimestampMicros;
-                var best = cur.getBestTarget();
-                var bestID = best.getFiducialId();
 
-                Optional<Pose3d> tagPose = layout.getTagPose(bestID);
-                if(best.getPoseAmbiguity() <= 0.2 && bestID >= 0 && tagPose.isPresent()){
-                    var targetPose = tagPose.get();
-                    Transform3d camToTarget = best.getBestCameraToTarget();
-                    Pose3d camPose = targetPose.transformBy(camToTarget.inverse());
+            // if(cur.getMultiTagResult().estimatedPose.isPresent){
+            //     Transform3d fieldToCamera = cur.getMultiTagResult().estimatedPose.best;
 
-                    var visionMeasure = camPose.transformBy(Constants.PhotonVisionConstants.CAMERA_TO_ROBOT);
-                    addVisionMeasurement(visionMeasure.toPose2d(), Units.millisecondsToSeconds((double)timestamp/1000));
-                }
+            //     Pose3d camPose = targetPose.transformBy(camToTarget.inverse());
+
+            //     var visionMeasure = camPose.transformBy(Constants.PhotonVisionConstants.CAMERA_TO_ROBOT);
+            //     addVisionMeasurement(visionMeasure.toPose2d(), Units.millisecondsToSeconds((double)timestamp/1000));
+            // }
+            // else if(cur.hasTargets()){
+            //     var timestamp = cur.metadata.captureTimestampMicros;
+            //     var best = cur.getBestTarget();
+            //     var bestID = best.getFiducialId();
+
+            //     Optional<Pose3d> tagPose = layout.getTagPose(bestID);
+            //     if(best.getPoseAmbiguity() <= 0.2 && bestID >= 0 && tagPose.isPresent()){
+            //         var targetPose = tagPose.get();
+            //         Transform3d camToTarget = best.getBestCameraToTarget();
+            //         Pose3d camPose = targetPose.transformBy(camToTarget.inverse());
+
+            //         var visionMeasure = camPose.transformBy(Constants.PhotonVisionConstants.CAMERA_TO_ROBOT);
+            //         addVisionMeasurement(visionMeasure.toPose2d(), Units.millisecondsToSeconds((double)timestamp/1000));
+            //     }
             }
         }
     }
@@ -354,32 +370,54 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         });
         m_simNotifier.startPeriodic(kSimLoopPeriod);
     }
-    public SwerveRequest.FieldCentric CameraGoToTag(double forward, double strafe, double turn, SwerveRequest.FieldCentric drive){        
-        var results = cam.getAllUnreadResults();
-        PIDController pidControllerDrive = new PIDController(0.11, 0, 0.2);
-        PIDController pidControllerAngle = new  PIDController(0.11, 0, 0.00);
-
-        if(!results.isEmpty()){
-            var cur = results.get(results.size() - 1);
+    public SwerveRequest CameraGoToTag(double forward, double strafe, double turn, SwerveRequest.FieldCentric drive){     
+        // TODO spend more time discussing other approaches to alignment code using odometry instead of raw vision data (Jerry + Ryan)           
+        if(cur != null){
             if(cur.hasTargets()){
-                for(var target : cur.getTargets()){
-                    if(target.getFiducialId() == 7){
-                        double curYaw = target.getYaw();
-                        double curDist = PhotonUtils.calculateDistanceToTargetMeters(
-                            Constants.PhotonVisionConstants.CAMERA_HEIGHT, 
-                            Constants.PhotonVisionConstants.APRILTAG_7_HEIGHT,
-                            Constants.PhotonVisionConstants.CAMERA_ANGLE, 
-                            Units.degreesToRadians(target.getPitch()));
-                        
-                        forward = pidControllerDrive.calculate(curDist, Constants.PhotonVisionConstants.DES_HUMAN_DISTANCE);
-                        turn = pidControllerAngle.calculate(curYaw, Constants.PhotonVisionConstants.DES_ANGLE);
+                PIDController pidControllerX = new PIDController(50, 0, 0.2); // TODO tune
+                PIDController pidControllerY = new  PIDController(50, 0, 0.2); // TODO tune
+                for(var target : cur.getTargets()) {
+                    if(target.getFiducialId() == 7) {
+                        double curDistX = target.bestCameraToTarget.getX(); // assumes bestCameraToTarget is robot relative
+                        double curDistY = target.bestCameraToTarget.getY(); // assumes bestCameraToTarget is robot relative
+
+                        forward = pidControllerX.calculate(curDistX, Constants.PhotonVisionConstants.DES_HUMAN_DISTANCEX);
+                        strafe = pidControllerY.calculate(curDistY, Constants.PhotonVisionConstants.DES_HUMAN_DISTANCEY);
+                        return new SwerveRequest.FieldCentricFacingAngle()
+                            .withVelocityX(-forward) // for tag 7, robot forward = negative x
+                            .withVelocityY(strafe) // For tag 7, robot right = positive y
+                            .withTargetDirection(Rotation2d.fromDegrees(180));
+                    } else if (target.getFiducialId() == 8) {
+                        // THIS SHOULD WORK FOR ALL APRILTAGS if bestCameraToTarget is robot relative
+                        // you can delete the if statement for tag 7 and just make this generic
+                        var xy = new Translation2d(target.bestCameraToTarget.getX(), target.bestCameraToTarget.getY());// assumes bestCameraToTarget is robot relative
+                        var rotated = xy.rotateBy(Rotation2d.fromDegrees(360.0 -  getStateCopy().RawHeading.getDegrees()));
+                        // var rotated = xy.rotateBy(Rotation2d.fromDegrees( getStateCopy().RawHeading.getDegrees())); // might be this, @jerry should test and try both
+
+                        forward = pidControllerX.calculate(rotated.getX(), Constants.PhotonVisionConstants.DES_HUMAN_DISTANCEX);
+                        strafe = pidControllerY.calculate(rotated.getY(), Constants.PhotonVisionConstants.DES_HUMAN_DISTANCEY);
+                        return new SwerveRequest.FieldCentricFacingAngle()
+                            .withVelocityX(forward) // for tag 7, robot forward = negative x
+                            .withVelocityY(strafe) // For tag 7, robot right = positive y
+                            .withTargetDirection(Rotation2d.fromDegrees(target.getYaw() + 180.0));
                     }
+
+                    // // If the camera to target is field relative
+                    // // The following works for all tags
+                    // if(target.getFiducialId() == 7) {
+                    //     double curDistX = target.bestCameraToTarget.getX(); // assumes bestCameraToTarget is field relative
+                    //     double curDistY = target.bestCameraToTarget.getY(); // assumes bestCameraToTarget is field relative
+
+                    //     forward = pidControllerX.calculate(curDistX, Constants.PhotonVisionConstants.DES_HUMAN_DISTANCEX);
+                    //     strafe = pidControllerY.calculate(curDistY, Constants.PhotonVisionConstants.DES_HUMAN_DISTANCEY);
+                    //     return new SwerveRequest.FieldCentricFacingAngle()
+                    //         .withVelocityX(forward) // for tag 7, robot forward = negative x
+                    //         .withVelocityY(strafe) // For tag 7, robot right = positive y
+                    //         .withTargetDirection(Rotation2d.fromDegrees(180));
+                    // }
                 }
             }
         }
-
-        pidControllerDrive.close();
-        pidControllerAngle.close();
 
         return drive.withVelocityX(forward)
                     .withVelocityY(strafe)

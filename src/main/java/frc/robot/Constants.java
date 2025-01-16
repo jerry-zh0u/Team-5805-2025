@@ -16,7 +16,9 @@ public final class Constants{
 
         //DESIRED CONSTANTS IN METERS FIXME
         public static final double DES_REEF_DISTANCE = 0.05;
-        public static final double DES_HUMAN_DISTANCE = 0.05;
+        public static final double DES_HUMAN_DISTANCEX = 0.05;
+        public static final double DES_HUMAN_DISTANCEY = 0;
+        
         public static final double DES_ANGLE = 0;
 
         public static final double CAMERA_HEIGHT = 0; //FIXME
@@ -27,5 +29,6 @@ public final class Constants{
 
         // How far from the target we want to be
         public static final Transform3d CAMERA_TO_ROBOT = new Transform3d(new Translation3d(0, -0.375, -0.0762), new Rotation3d(0, 0, CAMERA_ANGLE)); //FIXME
+        public static final Transform3d ROBOT_TO_CAMERA = new Transform3d(new Translation3d(0, -0.375, -0.0762), new Rotation3d(0, 0, CAMERA_ANGLE)); //FIXME
     }
 }
