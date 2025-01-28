@@ -8,6 +8,18 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
+
+repositories {
+
+maven {
+  url = uri("https://maven.pkg.github.com/team1868/TagalongLib")
+  credentials {
+      username = "space-cookies-bot"
+      password = "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"
+  }
+}
+
+}
 def ROBOT_MAIN_CLASS = "frc.robot.Main"
 
 // Define my targets (RoboRIO) and artifacts (deployable files)

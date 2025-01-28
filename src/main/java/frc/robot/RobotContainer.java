@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import frc.robot.Constants;
+import frc.robot.subsystems.*;
+
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
@@ -20,6 +23,7 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 
 public class RobotContainer {
+  public final Elevator _elevator = new Elevator(Constants.curRobot.elevatorConf);
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
@@ -73,7 +77,13 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return new PathPlannerAuto("New Auto");
+        return new PathPlannerAuto("B Auto 1");
         // return Commands.print("No autonomous command configured");
-        }
+        }  public void onEnable() {
+    _elevator.onEnable();
+  }
+  public void onDisable() {
+    _elevator.onDisable();
+  }
 }
+
