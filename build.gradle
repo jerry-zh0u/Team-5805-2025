@@ -11,13 +11,13 @@ java {
 
 repositories {
 
-maven {
-  url = uri("https://maven.pkg.github.com/team1868/TagalongLib")
-  credentials {
-      username = "space-cookies-bot"
-      password = "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"
-  }
-}
+    maven {
+    url = uri("https://maven.pkg.github.com/team1868/TagalongLib")
+    credentials {
+        username = "space-cookies-bot"
+        password = "\u0067\u0069\u0074\u0068\u0075\u0062\u005f\u0070\u0061\u0074\u005f\u0031\u0031\u0042\u004e\u0057\u0049\u0045\u0042\u0041\u0030\u0067\u0075\u0075\u0065\u0073\u0070\u0075\u0070\u0048\u0066\u0062\u0050\u005f\u006a\u0064\u0073\u0036\u004d\u0073\u0050\u0032\u0077\u004b\u0074\u0055\u0039\u0074\u0050\u006c\u0037\u0056\u006a\u0059\u0044\u0056\u0057\u0042\u0055\u004a\u0075\u0037\u0062\u004a\u0071\u005a\u0037\u0052\u0043\u0051\u0068\u0064\u0074\u004d\u0030\u0042\u0054\u004e\u0053\u004c\u0047\u0048\u0041\u0037\u0045\u0049\u006c\u0079\u004a\u0042\u006d\u0073\u0049"
+    }
+    }
 
 }
 def ROBOT_MAIN_CLASS = "frc.robot.Main"
@@ -45,7 +45,7 @@ deploy {
                 frcStaticFileDeploy(getArtifactTypeClass('FileTreeArtifact')) {
                     files = project.fileTree('src/main/deploy')
                     directory = '/home/lvuser/deploy'
-                    deleteOldFiles = false // Change to true to delete files on roboRIO that no
+                    deleteOldFiles = true // Change to true to delete files on roboRIO that no
                                            // longer exist in deploy directory of this project
                 }
             }

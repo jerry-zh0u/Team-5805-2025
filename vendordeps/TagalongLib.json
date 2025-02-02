@@ -10,7 +10,7 @@
     {
       "groupId": "com.tagalong.lib",
       "artifactId": "tagalonglib-java",
-      "version": "2025.11.0112"
+      "version": "2025.0.0039"
     }
   ],
   "jniDependencies": [],

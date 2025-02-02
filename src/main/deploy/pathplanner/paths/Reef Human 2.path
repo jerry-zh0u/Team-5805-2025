@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.058811475409836,
-        "y": 5.63734631147541
+        "x": 5.567,
+        "y": 2.582
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.058811475409836,
-        "y": 5.63734631147541
+        "x": 4.570190620712368,
+        "y": 1.9781608368118797
       },
       "isLocked": false,
-      "linkedName": "srijfisjiesjfi"
+      "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.349590163934426,
-        "y": 5.805174180327868
+        "x": 1.72575,
+        "y": 0.7684999999999991
       },
       "prevControl": {
-        "x": 1.349590163934426,
-        "y": 5.805174180327868
+        "x": 2.352659938694162,
+        "y": 1.086799367699155
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 55.0
   },
   "reversed": false,
-  "folder": "Blue 2",
+  "folder": "Blue",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 119.99999999999999
   },
   "useDefaultConstraints": true
 }

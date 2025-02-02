@@ -12,6 +12,7 @@ import edu.wpi.first.math.util.Units;
 import frc.robot.generated.TunerConstants;
 
 public final class Constants{
+    public static final RobotVersions curRobot = RobotVersions.COMPBOT;
     public static class PhotonVisionConstants{
         public static PhotonCamera m_Camera = new PhotonCamera("April"); //FIXME
 

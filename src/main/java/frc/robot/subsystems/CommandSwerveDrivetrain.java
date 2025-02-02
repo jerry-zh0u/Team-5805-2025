@@ -409,5 +409,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return drive.withVelocityX(forward)
                     .withVelocityY(strafe)
                     .withRotationalRate(turn);
-    }   
+    }
+
+    public PhotonPipelineResult getPhotonResult() {
+        return cur;
+    }
+    public void swerveDrive(double forward, double strafe, double angle){
+        
+    }
 }

@@ -5,25 +5,31 @@
 package frc.robot;
 
 import frc.robot.Constants;
+import frc.robot.commands.GoToPoseCommand;
+import frc.robot.constants.ElevatorHeights;
 import frc.robot.subsystems.*;
+import tagalong.commands.base.ElevateToCmd;
 
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.CommandSwerveDrivetrain;
 
 public class RobotContainer {
-  public final Elevator _elevator = new Elevator(Constants.curRobot.elevatorConf);
+  public final ElevatorSystem _elevator = new ElevatorSystem(Constants.curRobot.elevatorConf);
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
@@ -40,8 +46,20 @@ public class RobotContainer {
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
+    private final SendableChooser<Command> autoChooser;
+
     public RobotContainer() {
+        autoChooser = AutoBuilder.buildAutoChooser();
+
+        NamedCommands.registerCommand("BASE", new ElevateToCmd(_elevator, ElevatorHeights.BASE));
+        NamedCommands.registerCommand("L1", new ElevateToCmd(_elevator, ElevatorHeights.REEF_L1));
+        NamedCommands.registerCommand("L2", new ElevateToCmd(_elevator, ElevatorHeights.REEF_L2));
+        NamedCommands.registerCommand("L3", new ElevateToCmd(_elevator, ElevatorHeights.REEF_L3));
+        NamedCommands.registerCommand("L4", new ElevateToCmd(_elevator, ElevatorHeights.REEF_L4));
+
         configureBindings();
+
+        SmartDashboard.putData("Auto Chooser", autoChooser);
     }
 
     private void configureBindings() {
@@ -56,7 +74,8 @@ public class RobotContainer {
             )
         );
 
-        joystick.rightBumper().whileTrue(drivetrain.applyRequest(() -> drivetrain.CameraGoToTag(-joystick.getLeftY() * MaxSpeed, -joystick.getLeftX() * MaxSpeed, -joystick.getRightX() * MaxAngularRate, drive)));
+        // joystick.rightBumper().whileTrue(drivetrain.applyRequest(() -> drivetrain.CameraGoToTag(-joystick.getLeftY() * MaxSpeed, -joystick.getLeftX() * MaxSpeed, -joystick.getRightX() * MaxAngularRate, drive)));
+        joystick.rightBumper().whileTrue(new GoToPoseCommand(drivetrain, 7));
 
         joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
         joystick.b().whileTrue(drivetrain.applyRequest(() ->
@@ -73,13 +92,22 @@ public class RobotContainer {
         // reset the field-centric heading on left bumper press
         joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
+        joystick.x().onTrue(new ElevateToCmd(_elevator, ElevatorHeights.REEF_L1));
+        // sequential command group OR andThen()
+        // parallel command group OR alongWith()
+        // parallel race group OR raceWith()
+        // parallel deadline group OR deadlineWith()
+
         drivetrain.registerTelemetry(logger::telemeterize);
     }
 
     public Command getAutonomousCommand() {
-        return new PathPlannerAuto("B Auto 1");
+        return autoChooser.getSelected();
+        // return new PathPlannerAuto("B Auto 1");
         // return Commands.print("No autonomous command configured");
-        }  public void onEnable() {
+    }  
+        
+    public void onEnable() {
     _elevator.onEnable();
   }
   public void onDisable() {

@@ -1,11 +1,12 @@
 package frc.robot.constants;
 
-import frc.robot.subsystems.confs.compbotElevatorConf;
-import frc.robot.subsystems.confs.ElevatorConf;
+import frc.robot.subsystems.confs.CompbotElevatorConf;
+
 public enum RobotVersions {
-  COMPBOT(compbotElevatorConf.construct());
-  public final ElevatorConf elevatorConf;
-  RobotVersions(ElevatorConf elevatorConf) {
+  COMPBOT(CompbotElevatorConf.construct());
+
+  public final CompbotElevatorConf elevatorConf;
+  RobotVersions(CompbotElevatorConf elevatorConf) {
     this.elevatorConf = elevatorConf;
   }
 }

@@ -3,15 +3,15 @@ import edu.wpi.first.wpilibj.Filesystem;
 
 import tagalong.subsystems.micro.Elevator;
 import tagalong.subsystems.micro.augments.ElevatorAugment;
-import frc.robot.subsystems.confs.ElevatorConf;
+import frc.robot.subsystems.confs.ElevatorSystemConf;
 import tagalong.subsystems.TagalongSubsystemBase;
 
-public class Elevator extends TagalongSubsystemBase implements ElevatorAugment {
+public class ElevatorSystem extends TagalongSubsystemBase implements ElevatorAugment {
   public static final int Elevator_ID = 0;
 
   private final Elevator _elevator;
 
-  public final ElevatorConf _elevatorConf;
+  public final ElevatorSystemConf _elevatorConf;
 
 //   /* -------- Logging: utilities and configs -------- */
 //   private final ElevatorIOTalonFX _io;
@@ -30,7 +30,7 @@ public class Elevator extends TagalongSubsystemBase implements ElevatorAugment {
         return _elevator;
     }
   }
-  public Elevator(ElevatorConf elevatorConf) {
+  public ElevatorSystem(ElevatorSystemConf elevatorConf) {
     super(elevatorConf);
     _elevator = new Elevator( elevatorConf!= null ? elevatorConf.elevatorConf : null);
   if (_elevator._configuredMicrosystemDisable) {
