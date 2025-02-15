@@ -16,14 +16,15 @@
 public class CompbotElevatorElevatorConf extends ElevatorConf {
    public static final String name = "Elevator";
   public static final Motors[] motorTypes = {Motors.KRAKEN_X60};
-  public static final int[] motorDeviceIDs = {14, 15};
+  public static final int[] motorDeviceIDs = {5, 6};
   public static final String[] motorCanBus = {"rio"};
 
-  public static final InvertedValue[] motorDirection = {InvertedValue.CounterClockwise_Positive};
-  public static final NeutralModeValue[] motorEnabledBrakeMode = {NeutralModeValue.Coast};
-  public static final NeutralModeValue[] motorDisabledBrakeMode = {NeutralModeValue.Coast};
+  // public static final InvertedValue[] motorDirection = {InvertedValue.CounterClockwise_Positive};
+  public static final InvertedValue[] motorDirection = {InvertedValue.CounterClockwise_Positive, InvertedValue.Clockwise_Positive};
+  public static final NeutralModeValue[] motorEnabledBrakeMode = {NeutralModeValue.Coast, NeutralModeValue.Coast};
+  public static final NeutralModeValue[] motorDisabledBrakeMode = {NeutralModeValue.Coast, NeutralModeValue.Coast};
 
-  public static final int[][] gearRatio = {{1, 1}};
+  public static final int[][] gearRatio = {{5, 1}, {5, 1}};
 
   public static final boolean motorCurrentLimitStatorEnableLimit = true;
   public static final int motorCurrentLimitStatorPeakLimit = 80;
@@ -37,13 +38,13 @@ public static final FeedforwardConstants feedForward =
 
 /* -------- Positional -------- */
 public static final PIDSGVAConstants slot0 =
-    new PIDSGVAConstants(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+    new PIDSGVAConstants(0.001, 0.0, 0.0, 1, 0.0, 0.0, 0.0);
 /* -------- Velocity -------- */
 public static final PIDSGVAConstants slot1 =
-    new PIDSGVAConstants(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+    new PIDSGVAConstants(0.000, 0.0, 0.0, 1, 0.0, 0.0, 0.0);
 /* -------- Current -------- */
 public static final PIDSGVAConstants slot2 =
-    new PIDSGVAConstants(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+    new PIDSGVAConstants(0.000, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
 public static final boolean closedLoopConfigsContinuousWrap = true;
 
@@ -58,7 +59,7 @@ public static final FeedforwardConstants simFeedForward =
     new FeedforwardConstants(0.0, 0.0, 0.0, 0.0);
 /* -------- Positional -------- */
 public static final PIDSGVAConstants simSlot0 =
-    new PIDSGVAConstants(1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+    new PIDSGVAConstants(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 /* -------- Velocity -------- */
 public static final PIDSGVAConstants simSlot1 =
     new PIDSGVAConstants(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
@@ -81,15 +82,15 @@ public static final double drumDiameter = 0.0;
   private static final DistanceUnits trapezoidalLimitsUnits = DistanceUnits.METER;
   private static final VelocityUnits trapezoidalVelocityUnits = VelocityUnits.METERS_PER_SECOND;
   private static final AccelerationUnits trapezoidalAccelerationUnits = AccelerationUnits.METERS_PER_SECOND2;
-  private static final double trapezoidalLimitsVelocity = 0.0;
+  private static final double trapezoidalLimitsVelocity = 0.01;
   private static final double trapezoidalLimitsAcceleration = 0.0;
 
   public static final DistanceUnits positionalLimitsUnits = DistanceUnits.METER;
   public static final double positionalLimitsMin = 0.0;
-  public static final double positionalLimitsMax = 0.0;
+  public static final double positionalLimitsMax = 0.5;
   public static final DistanceUnits defaultTolerancesUnit = DistanceUnits.METER;
   public static final double defaultLowerTolerance = 0.0;
-  public static final double defaultUpperTolerance = 0.0;
+  public static final double defaultUpperTolerance = 1.0;
 
     public static CompbotElevatorElevatorConf
     construct() {

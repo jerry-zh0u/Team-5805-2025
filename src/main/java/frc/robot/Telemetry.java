@@ -106,6 +106,8 @@ public class Telemetry {
         SignalLogger.writeDoubleArray("DriveState/Pose", m_poseArray);
         SignalLogger.writeDoubleArray("DriveState/ModuleStates", m_moduleStatesArray);
         SignalLogger.writeDoubleArray("DriveState/ModuleTargets", m_moduleTargetsArray);
+        // SignalLogger.writeDouble("DriveState/VelocityX", state.Speeds.vxMetersPerSecond);.
+
         SignalLogger.writeDouble("DriveState/OdometryPeriod", state.OdometryPeriod, "seconds");
 
         /* Telemeterize the pose to a Field2d */
@@ -119,6 +121,15 @@ public class Telemetry {
             m_moduleSpeeds[i].setLength(state.ModuleStates[i].speedMetersPerSecond / (2 * MaxSpeed));
 
             SmartDashboard.putData("Module " + i, m_moduleMechanisms[i]);
+            // SmartDashboard.putNumber("Module Velocity X" + i, driveSpeeds.);
+            SmartDashboard.putNumber("Module Velocity Y" + i, state.Speeds.vyMetersPerSecond);
         }
     }
+    // public double getSpeeds(){
+    //     return state.Speeds.
+    // }
+    // @Override
+    // public void periodic(){
+
+    // }
 }

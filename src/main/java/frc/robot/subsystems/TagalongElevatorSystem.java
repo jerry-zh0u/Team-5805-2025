@@ -6,7 +6,7 @@ import tagalong.subsystems.micro.augments.ElevatorAugment;
 import frc.robot.subsystems.confs.ElevatorSystemConf;
 import tagalong.subsystems.TagalongSubsystemBase;
 
-public class ElevatorSystem extends TagalongSubsystemBase implements ElevatorAugment {
+public class TagalongElevatorSystem extends TagalongSubsystemBase implements ElevatorAugment {
   public static final int Elevator_ID = 0;
 
   private final Elevator _elevator;
@@ -30,7 +30,7 @@ public class ElevatorSystem extends TagalongSubsystemBase implements ElevatorAug
         return _elevator;
     }
   }
-  public ElevatorSystem(ElevatorSystemConf elevatorConf) {
+  public TagalongElevatorSystem(ElevatorSystemConf elevatorConf) {
     super(elevatorConf);
     _elevator = new Elevator( elevatorConf!= null ? elevatorConf.elevatorConf : null);
   if (_elevator._configuredMicrosystemDisable) {

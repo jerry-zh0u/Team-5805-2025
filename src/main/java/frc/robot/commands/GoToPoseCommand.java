@@ -14,6 +14,8 @@ public class GoToPoseCommand extends Command  {
     private final CommandSwerveDrivetrain drivetrain;
     private final PIDController pidControllerX = new PIDController(50, 0, 0.2); // TODO tune
     private final PIDController pidControllerY = new  PIDController(50, 0, 0.2); // TODO tune
+    private final PIDController pidControllerZ = new PIDController(50, 0, 0.2);
+
     private final int tagID;
 
     public GoToPoseCommand(CommandSwerveDrivetrain drivetrain, int tagID) {
@@ -36,33 +38,39 @@ public class GoToPoseCommand extends Command  {
         if(cur != null){
             if(cur.hasTargets()){
                 for(var target : cur.getTargets()) {
-                    if (target.getFiducialId() == 7) {
-                        // THIS SHOULD WORK FOR ALL APRILTAGS if bestCameraToTarget is robot relative
-                        var xy = new Translation2d(target.bestCameraToTarget.getX(), target.bestCameraToTarget.getY());// assumes bestCameraToTarget is robot relative
-                        var rotated = xy.rotateBy(Rotation2d.fromDegrees(360.0 -  drivetrain.getStateCopy().RawHeading.getDegrees()));
+                    // if (target.getFiducialId() == 7) {
+                    //     System.err.println("=====");
+                    //     // THIS SHOULD WORK FOR ALL APRILTAGS if bestCameraToTarget is robot relative
+                    //     var xy = new Translation2d(target.bestCameraToTarget.getX(), target.bestCameraToTarget.getY());// assumes bestCameraToTarget is robot relative
+                    //     var rotated = xy.rotateBy(Rotation2d.fromDegrees(360.0 -  drivetrain.getStateCopy().RawHeading.getDegrees()));
 
-                        double forward = pidControllerX.calculate(rotated.getX(), Constants.PhotonVisionConstants.DES_HUMAN_DISTANCEX);
-                        double strafe = pidControllerY.calculate(rotated.getY(), Constants.PhotonVisionConstants.DES_HUMAN_DISTANCEY);
+                    //     double forward = pidControllerX.calculate(rotated.getX(), Constants.PhotonVisionConstants.DES_HUMAN_DISTANCEX);
+                    //     double strafe = pidControllerY.calculate(rotated.getY(), Constants.PhotonVisionConstants.DES_HUMAN_DISTANCEY);
 
-                        drivetrain.setControl(new SwerveRequest.FieldCentricFacingAngle()
-                            .withVelocityX(forward) // for tag 7, robot forward = negative x
-                            .withVelocityY(strafe) // For tag 7, robot right = positive y
-                            .withTargetDirection(Rotation2d.fromDegrees(target.getYaw() + 180.0)));
-                    }
+                    //     drivetrain.setControl(new SwerveRequest.FieldCentricFacingAngle()
+                    //         .withVelocityX(forward) // for tag 7, robot forward = negative x
+                    //         .withVelocityY(strafe) // For tag 7, robot right = positive y
+                    //         .withTargetDirection(Rotation2d.fromDegrees(target.getYaw() + 180.0)));
+                    // }
 
                     // // If the camera to target is field relative
                     // // The following works for all tags
-                    // if(target.getFiducialId() == tagID) {
-                    //     double curDistX = target.bestCameraToTarget.getX(); // assumes bestCameraToTarget is field relative
-                    //     double curDistY = target.bestCameraToTarget.getY(); // assumes bestCameraToTarget is field relative
+                    if(target.getFiducialId() == tagID) {
+                        double curDistX = target.bestCameraToTarget.getX(); // assumes bestCameraToTarget is field relative
+                        double curDistY = target.bestCameraToTarget.getY(); // assumes bestCameraToTarget is field relative
+                        double curDistZ = target.bestCameraToTarget.getZ();
+                        
+                        System.err.println(curDistX + " " + curDistY + " " + curDistZ + " ====");
 
-                    //     forward = pidControllerX.calculate(curDistX, Constants.PhotonVisionConstants.DES_HUMAN_DISTANCEX);
-                    //     strafe = pidControllerY.calculate(curDistY, Constants.PhotonVisionConstants.DES_HUMAN_DISTANCEY);
-                    //     return new SwerveRequest.FieldCentricFacingAngle()
-                    //         .withVelocityX(forward) // for tag 7, robot forward = negative x
-                    //         .withVelocityY(strafe) // For tag 7, robot right = positive y
-                    //         .withTargetDirection(Rotation2d.fromDegrees(180));
-                    // }
+                        double forward = pidControllerX.calculate(curDistX, Constants.PhotonVisionConstants.DES_HUMAN_DISTANCEX);
+                        double strafe = pidControllerY.calculate(curDistY, Constants.PhotonVisionConstants.DES_HUMAN_DISTANCEY);
+                        // double rotate = pidControllerZ.calculate(curDistZ, 1)
+
+                        drivetrain.setControl(new SwerveRequest.FieldCentricFacingAngle()
+                            .withVelocityX(0) // for tag 7, robot forward = negative x
+                            .withVelocityY(0) // For tag 7, robot right = positive y
+                            .withTargetDirection(Rotation2d.fromDegrees(180)));
+                    }
                 }
             }
         }

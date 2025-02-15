@@ -25,7 +25,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledInit() {
-    m_robotContainer.onDisable();
+    // m_robotContainer.onDisable();
 
   }
 
@@ -34,7 +34,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledExit() {
-    m_robotContainer.onEnable();
+    // m_robotContainer.onEnable();
 
   }
 

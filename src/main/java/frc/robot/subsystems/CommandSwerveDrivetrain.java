@@ -314,7 +314,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             });
         }
         SmartDashboard.putNumber("Pose X", getState().Pose.getX());
-        SmartDashboard.putNumber("Pose Y", getState().Pose.getY());
+        SmartDashboard.putNumber("Velocity 1", getState().ModuleStates[0].speedMetersPerSecond);
+        SmartDashboard.putNumber("Velocity 2", getState().ModuleStates[1].speedMetersPerSecond);
+        SmartDashboard.putNumber("Velocity 3", getState().ModuleStates[2].speedMetersPerSecond);
+        SmartDashboard.putNumber("Velocity 4", getState().ModuleStates[3].speedMetersPerSecond);
+        // SmartDashboard.putNumber("Pose Y", getState().Pose.getY());
         _field.setRobotPose(getState().Pose.getX(), getState().Pose.getY(), getState().Pose.getRotation());
 
         //VISION
