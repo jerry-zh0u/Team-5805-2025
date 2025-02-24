@@ -9,23 +9,22 @@ import frc.robot.subsystems.ElevatorSubsystem;
 
 public class ElevatorCommands extends Command{
     private ElevatorSubsystem elevator;
-    private Distance desiredDist;
+    private double desiredDist;
 
-    public ElevatorCommands(ElevatorSubsystem _elevator, Distance height){
+    public ElevatorCommands(ElevatorSubsystem _elevator, double height){
         this.elevator = _elevator;
         this.desiredDist = height;
     }
 
     @Override
     public void execute(){
-        System.err.println("======" + desiredDist.toString());
         elevator.setPosition(desiredDist);
     }
 
     @Override
     public boolean isFinished(){
-        if(Math.abs(elevator.getHeight() - desiredDist.in(Inches)) <= Constants.ElevatorConstants.ELEVATORDEADBAND.in(Inches)){
-            System.err.println("+++++");
+        if(Math.abs(elevator.getHeight() - desiredDist) <= Constants.ElevatorConstants.ELEVATORDEADBAND){
+            System.err.println("+++++ Finished");
             return true;
         }
         return false;

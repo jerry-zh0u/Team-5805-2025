@@ -167,7 +167,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         if (Utils.isSimulation()) {
             startSimThread();
         }
-        _field.setRobotPose(getState().Pose.getX(), getState().Pose.getY(), getState().Pose.getRotation());
         configureAutoBuilder();
     }
 
@@ -193,8 +192,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         if (Utils.isSimulation()) {
             startSimThread();
         }
-        controlboardTab.add("Field", _field).withSize(11, 5).withPosition(1, 1);
-        _field.setRobotPose(getState().Pose.getX(), getState().Pose.getY(), getState().Pose.getRotation());
+        // controlboardTab.add("Field", _field).withSize(11, 5).withPosition(1, 1);
         configureAutoBuilder();
     }
 
@@ -228,8 +226,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         if (Utils.isSimulation()) {
             startSimThread();
         }
-        controlboardTab.add("Field", _field).withSize(11, 5).withPosition(1, 1);
-        _field.setRobotPose(getState().Pose.getX(), getState().Pose.getY(), getState().Pose.getRotation());
         configureAutoBuilder();
     }
 
@@ -313,26 +309,53 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 m_hasAppliedOperatorPerspective = true;
             });
         }
-        SmartDashboard.putNumber("Pose X", getState().Pose.getX());
+        // SmartDashboard.putNumber("Pose X", getState().Pose.getX());
+        // SmartDashboard.putNumber("Pose Y", getState().Pose.getY());
         SmartDashboard.putNumber("Velocity 1", getState().ModuleStates[0].speedMetersPerSecond);
         SmartDashboard.putNumber("Velocity 2", getState().ModuleStates[1].speedMetersPerSecond);
         SmartDashboard.putNumber("Velocity 3", getState().ModuleStates[2].speedMetersPerSecond);
         SmartDashboard.putNumber("Velocity 4", getState().ModuleStates[3].speedMetersPerSecond);
         // SmartDashboard.putNumber("Pose Y", getState().Pose.getY());
-        _field.setRobotPose(getState().Pose.getX(), getState().Pose.getY(), getState().Pose.getRotation());
+        // _field.setRobotPose(getState().Pose.getX(), getState().Pose.getY(), getState().Pose.getRotation());
 
         //VISION
         var results = cam.getAllUnreadResults();
         // var timestamp = Utils.getCurrentTimeSeconds();
         // System.err.println(results.size() + " ==========");
-        if(!results.isEmpty()){
-            cur = results.get(results.size() - 1);
+        // if(!results.isEmpty()){
+        //     System.err.println("..............");
+        //     cur = results.get(results.size() - 1);
 
             // can potentially run through every result rather than just the most recent for more accurate representation of data
-            var photonEstimate = camPoseEstimator.update(cur).orElse(null);
-            if( photonEstimate != null){
-                addVisionMeasurement(photonEstimate.estimatedPose.toPose2d(), photonEstimate.timestampSeconds);
+            // var photonEstimate = camPoseEstimator.update(cur).orElse(null);
+            // if( photonEstimate != null){
+            //     System.err.println("/////////" + " " + photonEstimate.estimatedPose.toPose2d().getX() + " " + photonEstimate.estimatedPose.toPose2d().getY() + " " + photonEstimate.timestampSeconds);
+            //     // addVisionMeasurement(photonEstimate.estimatedPose.toPose2d(), photonEstimate.timestampSeconds);
+            //     addVisionMeasurement(photonEstimate.estimatedPose.toPose2d(), photonEstimate.timestampSeconds);
+            // }
+            // var results = cam.getAllUnreadResults();
+            var timestamp = Utils.getCurrentTimeSeconds();
+
+        if(!results.isEmpty()){
+            cur = results.get(results.size() - 1);
+            
+            var best = cur.getBestTarget();
+            if(best != null){
+                var bestID = best.getFiducialId();
+
+                // System.err.println(bestID + " ==== Found");
+
+                Optional<Pose3d> tagPose = layout.getTagPose(bestID);
+                if(best.getPoseAmbiguity() <= 0.2 && bestID >= 0 && tagPose.isPresent()){
+                    var targetPose = tagPose.get();
+                    Transform3d camToTarget = best.getBestCameraToTarget();
+                    Pose3d camPose = targetPose.transformBy(camToTarget.inverse());
+    
+                    var visionMeasure = camPose.transformBy(Constants.PhotonVisionConstants.CAMERA_TO_ROBOT);
+                    addVisionMeasurement(visionMeasure.toPose2d(), timestamp);
+                }
             }
+        }
 
             // if(cur.getMultiTagResult().estimatedPose.isPresent){
             //     Transform3d fieldToCamera = cur.getMultiTagResult().estimatedPose.best;
@@ -356,7 +379,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             //         var visionMeasure = camPose.transformBy(Constants.PhotonVisionConstants.CAMERA_TO_ROBOT);
             //         addVisionMeasurement(visionMeasure.toPose2d(), Units.millisecondsToSeconds((double)timestamp/1000));
             //     }
-            }
+            // }
         }
 
     private void startSimThread() {
@@ -385,7 +408,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                         var xy = new Translation2d(target.bestCameraToTarget.getX(), target.bestCameraToTarget.getY());// assumes bestCameraToTarget is robot relative
                         var rotated = xy.rotateBy(Rotation2d.fromDegrees(360.0 -  getStateCopy().RawHeading.getDegrees()));
 
-                        forward = pidControllerX.calculate(rotated.getX(), Constants.PhotonVisionConstants.DES_HUMAN_DISTANCEX);
+                        // forward = pidControllerX.calculate(rotated.getX(), Constants.PhotonVisionConstants.DES_HUMAN_DISTANCEX);
                         strafe = pidControllerY.calculate(rotated.getY(), Constants.PhotonVisionConstants.DES_HUMAN_DISTANCEY);
                         return new SwerveRequest.FieldCentricFacingAngle()
                             .withVelocityX(forward) // for tag 7, robot forward = negative x

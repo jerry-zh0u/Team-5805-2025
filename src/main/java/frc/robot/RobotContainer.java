@@ -5,9 +5,12 @@
 package frc.robot;
 
 import frc.robot.Constants;
+import frc.robot.commands.AutoCoralManipulator;
+import frc.robot.commands.ClimbCommands;
 import frc.robot.commands.CoralManipulatorGo;
 import frc.robot.commands.ElevatorCommands;
 import frc.robot.commands.GoToPoseCommand;
+import frc.robot.commands.WaitCommand;
 import frc.robot.constants.ElevatorHeights;
 import frc.robot.subsystems.*;
 import tagalong.TagalongConfiguration;
@@ -26,6 +29,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
@@ -46,7 +50,8 @@ public class RobotContainer {
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
-    private final CommandPS4Controller joystick = new CommandPS4Controller(0);
+    // private final CommandPS4Controller driver = new CommandPS4Controller(0);
+    private final CommandPS4Controller opereator = new CommandPS4Controller(1);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
@@ -54,16 +59,20 @@ public class RobotContainer {
 
     public final CoralManipulator coralManip = new CoralManipulator();
 
+    public final Climb climb = new Climb();
+
     private final SendableChooser<Command> autoChooser;
 
     public RobotContainer() {
         autoChooser = AutoBuilder.buildAutoChooser();
 
-        // NamedCommands.registerCommand("BASE", new ElevateToCmd(_elevator, ElevatorHeights.BASE));
-        // NamedCommands.registerCommand("L1", new ElevateToCmd(_elevator, ElevatorHeights.REEF_L1));
-        // NamedCommands.registerCommand("L2", new ElevateToCmd(_elevator, ElevatorHeights.REEF_L2));
-        // NamedCommands.registerCommand("L3", new ElevateToCmd(_elevator, ElevatorHeights.REEF_L3));
-        // NamedCommands.registerCommand("L4", new ElevateToCmd(_elevator, ElevatorHeights.REEF_L4));
+        NamedCommands.registerCommand("BASE", new ElevatorCommands(elevator, Constants.L0));
+        NamedCommands.registerCommand("L1", new ElevatorCommands(elevator, Constants.L1));
+        NamedCommands.registerCommand("L2", new ElevatorCommands(elevator, Constants.L2));
+        NamedCommands.registerCommand("L3", new ElevatorCommands(elevator, Constants.L3));
+        NamedCommands.registerCommand("L4", new ElevatorCommands(elevator, Constants.L4));
+        NamedCommands.registerCommand("EJECT", new SequentialCommandGroup(new CoralManipulatorGo(coralManip, -1), new WaitCommand(1), new CoralManipulatorGo(coralManip, 0)));
+        // NamedCommands.registerCommand("EJECT", new AutoCoralManipulator(coralManip, -1));
 
         configureBindings();
         TagalongConfiguration.ffTuningMicrosystems.add("_elevator");
@@ -80,50 +89,60 @@ public class RobotContainer {
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() ->
-                drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)4
-                    .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+                drive.withVelocityX(-Constants.driver.getLeftY() * MaxSpeed * 0.6) // Drive forward with negative Y (forward)4
+                    .withVelocityY(-Constants.driver.getLeftX() * MaxSpeed * 0.6) // Drive left with negative X (left)
+                    .withRotationalRate(-Constants.driver.getRightX() * MaxAngularRate * 0.6) // Drive counterclockwise with negative X (left)
             )
         );
 
-        // joystick.rightBumper().whileTrue(drivetrain.applyRequest(() -> drivetrain.CameraGoToTag(-joystick.getLeftY() * MaxSpeed, -joystick.getLeftX() * MaxSpeed, -joystick.getRightX() * MaxAngularRate, drive)));
-        // joystick.R1().whileTrue(new GoToPoseCommand(drivetrain, 7));
-        // joystick.R1().whileTrue(new GoToPoseCommand(drivetrain, 7));
+        // driver.rightBumper().whileTrue(drivetrain.applyRequest(() -> drivetrain.CameraGoToTag(-driver.getLeftY() * MaxSpeed, -driver.getLeftX() * MaxSpeed, -driver.getRightX() * MaxAngularRate, drive)));
+        // driver.L2().toggleOnTrue(new GoToPoseCommand(drivetrain, 7));
+        Constants.driver.L2().onTrue(new GoToPoseCommand(drivetrain, 17));
 
-        // joystick.R1().
-        // joystick.R1().onTrue(new ElevatorCommands(elevator, Constants.L0));
-        // joystick.L1().onTrue(new ElevatorCommands(elevator, Constants.L4));
-        joystick.triangle().onTrue(new ElevatorCommands(elevator, Constants.L0));
-        joystick.circle().onTrue(new ElevatorCommands(elevator, Constants.L1));
-        joystick.cross().onTrue(new ElevatorCommands(elevator, Constants.L2));
-        joystick.square().onTrue(new ElevatorCommands(elevator, Constants.L3));
-        joystick.L1().onTrue(new ElevatorCommands(elevator, Constants.L4));
+        // Constants.driver.R1().
+        // Constants.driver.R1().onTrue(new ElevatorCommands(elevator, Constants.L0));
+        // Constants.driver.L1().onTrue(new ElevatorCommands(elevator, Constants.L4));
+        Constants.driver.square().onTrue(new ElevatorCommands(elevator, Constants.L1));
+        // Constants.driver.L1().onTrue(new ElevatorCommands(elevator, Constants.L1));
+        Constants.driver.cross().onTrue(new ElevatorCommands(elevator, Constants.L2));
+        Constants.driver.circle().onTrue(new ElevatorCommands(elevator, Constants.L3));
+        Constants.driver.triangle().onTrue(new ElevatorCommands(elevator, Constants.L4));
+        // driver.L2().onTrue(Commands.runOnce(() -> elevator.zero(), elevator));
+        // // driver.square().onTrue(new ElevatorCommands(elevator, 31.5));
+        // // driver.circle().onTrue(new ElevatorCommands(elevator, 31.5));
+        // driver.circle().onTrue(new ElevatorCommands(elevator, Constants.L1));
+        // driver.cross().onTrue(new ElevatorCommands(elevator, Constants.L2));
+        // driver.square().onTrue(new ElevatorCommands(elevator, Constants.L3));
+        // driver.L1().onTrue(new ElevatorCommands(elevator, Constants.L4));
 
-        joystick.L2().onTrue(Commands.runOnce(() -> elevator.zero(), elevator));
+        opereator.L2().whileTrue(new ClimbCommands(climb, 1));
+        opereator.L2().whileFalse(new ClimbCommands(climb, 0));
+        opereator.L1().whileTrue(new ClimbCommands(climb, -1));
+        opereator.L1().whileFalse(new ClimbCommands(climb, 0));
 
-        joystick.R1().whileTrue(new CoralManipulatorGo(coralManip, 1));
-        joystick.R1().whileFalse(new CoralManipulatorGo(coralManip, 0));
-        joystick.R2().whileTrue(new CoralManipulatorGo(coralManip, -1));
-        joystick.R2().whileFalse(new CoralManipulatorGo(coralManip, 0));
+        Constants.driver.R1().whileTrue(new CoralManipulatorGo(coralManip, 1));
+        Constants.driver.R1().whileFalse(new CoralManipulatorGo(coralManip, 0));
+        Constants.driver.R2().whileTrue(new CoralManipulatorGo(coralManip, -1));
+        Constants.driver.R2().whileFalse(new CoralManipulatorGo(coralManip, 0));
 
-        // joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
-        // joystick.b().whileTrue(drivetrain.applyRequest(() ->
-        //     point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
+        // driver.a().whileTrue(drivetrain.applyRequest(() -> brake));
+        // driver.b().whileTrue(drivetrain.applyRequest(() ->
+        //     point.withModuleDirection(new Rotation2d(-driver.getLeftY(), -driver.getLeftX()))
         // ));
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
-        // joystick.back().and(joystick.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-        // joystick.back().and(joystick.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-        // joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-        // joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+        // driver.back().and(driver.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+        // driver.back().and(driver.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
+        // driver.start().and(driver.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+        // driver.start().and(driver.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
         // reset the field-centric heading on left bumper press
-        // joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+        Constants.driver.L1().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-        // joystick.cross().onTrue(new ElevateToCmd(_elevator, ElevatorHeights.REEF_L1));
+        // driver.cross().onTrue(new ElevateToCmd(_elevator, ElevatorHeights.REEF_L1));
         
-        // joystick.cross().onTrue(new ElevateToCmd(_elevator, ElevatorHeights.REEF_L1));
+        // driver.cross().onTrue(new ElevateToCmd(_elevator, ElevatorHeights.REEF_L1));
         // sequential command group OR andThen()
         // parallel command group OR alongWith()
         // parallel race group OR raceWith()
@@ -133,8 +152,8 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return autoChooser.getSelected();
-        // return new PathPlannerAuto("B Auto 1");
+        // return autoChooser.getSelected();
+        return new PathPlannerAuto("BlueMiddle1");
         // return Commands.print("No autonomous command configured");
     }  
         

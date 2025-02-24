@@ -5,13 +5,15 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.CoralManipulator;
 
-public class CoralManipulatorGo extends Command {
+public class AutoCoralManipulator extends Command {
     private CoralManipulator coral;
+    private WaitCommand wait;
     private double speed;
 
-    public CoralManipulatorGo(CoralManipulator _coral, double _speed){
+    public AutoCoralManipulator(CoralManipulator _coral, double _speed){
         this.coral = _coral;
         speed = _speed;
+        wait = new WaitCommand(0.5);
     }
 
     @Override
@@ -21,6 +23,6 @@ public class CoralManipulatorGo extends Command {
 
     @Override
     public boolean isFinished(){
-        return true;
+        return wait.isFinished();
     } 
 }
