@@ -77,7 +77,7 @@ public final class Constants{
                 ELEVATORCONFIG.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
                 ELEVATORCONFIG.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0;
 
-                // ELEVATORCONFIG.Slot0.GravityType = GravityTypeValue.Elevator_Static;
+                ELEVATORCONFIG.Slot0.GravityType = GravityTypeValue.Elevator_Static;
 
                 // ELEVATORCONFIG.Feedback.SensorToMechanismRatio = 0.2; //FIXME THIS MAY BE 5
 
@@ -89,8 +89,8 @@ public final class Constants{
                 ELEVATORCONFIG.Slot0.kI = 0.0;
                 ELEVATORCONFIG.Slot0.kD = 0;
 
-                ELEVATORCONFIG.MotionMagic.MotionMagicCruiseVelocity = 100;// using 100 nonr 125 some 200 some
-                ELEVATORCONFIG.MotionMagic.MotionMagicAcceleration = 100;
+                ELEVATORCONFIG.MotionMagic.MotionMagicCruiseVelocity = 25;// using 100 nonr 125 some 200 some
+                ELEVATORCONFIG.MotionMagic.MotionMagicAcceleration = 50;
                 ELEVATORCONFIG.MotionMagic.MotionMagicExpo_kV = 0.5;
                 // ELEVATORCONFIG.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseClosedLoopSign;
             }

@@ -77,5 +77,7 @@ public class ElevatorSubsystem extends SubsystemBase{
     public void periodic(){
         SmartDashboard.putNumber("Elevator Position", getHeight());
         SmartDashboard.putNumber("Elevator Desired Position", lastPos);
+
+        SmartDashboard.putNumber("Raw Encoder Readings", rightMotorMaster.getPosition().getValueAsDouble());
     }
 }
