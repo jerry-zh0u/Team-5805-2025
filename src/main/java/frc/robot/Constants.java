@@ -77,15 +77,15 @@ public final class Constants{
                 ELEVATORCONFIG.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
                 ELEVATORCONFIG.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0;
 
-                // ELEVATORCONFIG.Slot0.GravityType = GravityTypeValue.Elevator_Static;
+                ELEVATORCONFIG.Slot0.GravityType = GravityTypeValue.Elevator_Static;
 
                 // ELEVATORCONFIG.Feedback.SensorToMechanismRatio = 0.2; //FIXME THIS MAY BE 5
 
-                ELEVATORCONFIG.Slot0.kG = 0.3;
-                ELEVATORCONFIG.Slot0.kS = 0.4;
-                ELEVATORCONFIG.Slot0.kV = 0.001;
+                ELEVATORCONFIG.Slot0.kG = 0.3; //.25
+                ELEVATORCONFIG.Slot0.kS = 0.48; //.48
+                ELEVATORCONFIG.Slot0.kV = 0.001; //.189
                 ELEVATORCONFIG.Slot0.kA = 0.0;
-                ELEVATORCONFIG.Slot0.kP = 0.5;
+                ELEVATORCONFIG.Slot0.kP = 0.65;
                 ELEVATORCONFIG.Slot0.kI = 0.0;
                 ELEVATORCONFIG.Slot0.kD = 0;
 

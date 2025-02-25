@@ -16,23 +16,40 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class ElevatorSubsystem extends SubsystemBase{
-    private TalonFX leftMotorFollower, rightMotorMaster;
+    public static ElevatorSubsystem elevatorSubsystem;
+    public TalonFX leftMotorFollower, rightMotorMaster;
+
+    private Follower follower;
 
     private double lastPos;
+
+    private int currentSpike;
+    private int noCurrentSpike;
 
     VoltageOut voltageRequest = new VoltageOut(0);
 
     MotionMagicVoltage motionRequest;
     
     public ElevatorSubsystem(){
-        leftMotorFollower = new TalonFX(Constants.ElevatorConstants.ELEVATORLEFTID);
+        // leftMotorFollower = new TalonFX(Constants.ElevatorConstants.ELEVATORLEFTID);
         rightMotorMaster = new TalonFX(Constants.ElevatorConstants.ELEVATORRIGHTID);
+        rightMotorMaster.getConfigurator().apply(Constants.ElevatorConstants.ELEVATORCONFIG);
 
-        lastPos = 0;
+        configureFollowerMotor(Constants.ElevatorConstants.ELEVATORLEFTID, true);
+
+        lastPos = 15;
         motionRequest = new MotionMagicVoltage(0);
 
-        rightMotorMaster.getConfigurator().apply(Constants.ElevatorConstants.ELEVATORCONFIG);
-        leftMotorFollower.getConfigurator().apply(Constants.ElevatorConstants.ELEVATORCONFIG);
+        // leftmotorfollower.set(Follower, rightMotorMaster);
+        // leftMotorFollower.setControl(new Follower(rightMotorMaster.getDeviceID(), true));
+        // leftMotorFollower.getConfigurator().apply(Constants.ElevatorConstants.ELEVATORCONFIG);
+    }
+
+    public void configureFollowerMotor(int followerMotorId, boolean opposeMasterDirection) {
+        leftMotorFollower = new TalonFX(followerMotorId);
+        follower = new Follower(rightMotorMaster.getDeviceID(), opposeMasterDirection);
+
+        leftMotorFollower.setControl(follower);
     }
 
     public void setPosition(double height){
@@ -43,7 +60,7 @@ public class ElevatorSubsystem extends SubsystemBase{
         // rightMotorMaster.setControl(motionRequest.withPosition(10));
 
 
-        leftMotorFollower.setControl(new Follower(rightMotorMaster.getDeviceID(), true));
+        // leftMotorFollower.setControl(new Follower(rightMotorMaster.getDeviceID(), true));
     }
 
     public double getHeight(){
@@ -57,6 +74,10 @@ public class ElevatorSubsystem extends SubsystemBase{
         System.err.println("Zero Run" + " " + rightMotorMaster.getPosition().getValueAsDouble());
     }
 
+    public void setVoltage(double output) {
+        rightMotorMaster.setVoltage(output);
+    }
+
     private double convertDistRotation(double height){
         return (height - Constants.ElevatorConstants.ELEVATORBASEHEIGHT)/Constants.ElevatorConstants.INCHPERROTATION;
 
@@ -66,10 +87,10 @@ public class ElevatorSubsystem extends SubsystemBase{
     public void setMode(boolean coastMode){
         if(coastMode){
             rightMotorMaster.getConfigurator().apply(Constants.ElevatorConstants.ELEVATOR_COAST_CONFIG);
-            leftMotorFollower.getConfigurator().apply(Constants.ElevatorConstants.ELEVATOR_COAST_CONFIG);
+            // leftMotorFollower.getConfigurator().apply(Constants.ElevatorConstants.ELEVATOR_COAST_CONFIG);
         }else{
             rightMotorMaster.getConfigurator().apply(Constants.ElevatorConstants.ELEVATORCONFIG);
-            leftMotorFollower.getConfigurator().apply(Constants.ElevatorConstants.ELEVATORCONFIG);
+            // leftMotorFollower.getConfigurator().apply(Constants.ElevatorConstants.ELEVATORCONFIG);
         }
     }
 
@@ -77,5 +98,33 @@ public class ElevatorSubsystem extends SubsystemBase{
     public void periodic(){
         SmartDashboard.putNumber("Elevator Position", getHeight());
         SmartDashboard.putNumber("Elevator Desired Position", lastPos);
+        super.periodic();
+
+        if (rightMotorMaster.getSupplyCurrent().getValueAsDouble() > 3.5) 
+            currentSpike++;
+        else noCurrentSpike++;
+
+        if (noCurrentSpike >= 3) {
+            currentSpike = 0;
+            noCurrentSpike = 0;
+        }
+
+        SmartDashboard.putNumber("Stall Count Current Spike", currentSpike);
+        SmartDashboard.putNumber("No Stall Count Current Spike", noCurrentSpike);
+    }
+
+    public static ElevatorSubsystem getInstance() {
+        if (elevatorSubsystem == null) {
+            elevatorSubsystem = new ElevatorSubsystem();
+        }
+        return elevatorSubsystem;
+    }
+
+    public void testVoltage() {
+        rightMotorMaster.setVoltage(-1);
+    }
+
+    public boolean isAtBottom() {
+        return currentSpike >= 1;
     }
 }

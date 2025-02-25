@@ -11,6 +11,7 @@ import frc.robot.commands.CoralManipulatorGo;
 import frc.robot.commands.ElevatorCommands;
 import frc.robot.commands.GoToPoseCommand;
 import frc.robot.commands.WaitCommand;
+import frc.robot.commands.ZeroElevator;
 import frc.robot.constants.ElevatorHeights;
 import frc.robot.subsystems.*;
 import tagalong.TagalongConfiguration;
@@ -29,6 +30,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -55,7 +57,8 @@ public class RobotContainer {
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
-    public final ElevatorSubsystem elevator = new ElevatorSubsystem();
+    // public final ElevatorSubsystem elevator = new ElevatorSubsystem();
+    public static final ElevatorSubsystem elevator = ElevatorSubsystem.getInstance();
 
     public final CoralManipulator coralManip = new CoralManipulator();
 
@@ -97,7 +100,7 @@ public class RobotContainer {
 
         // driver.rightBumper().whileTrue(drivetrain.applyRequest(() -> drivetrain.CameraGoToTag(-driver.getLeftY() * MaxSpeed, -driver.getLeftX() * MaxSpeed, -driver.getRightX() * MaxAngularRate, drive)));
         // driver.L2().toggleOnTrue(new GoToPoseCommand(drivetrain, 7));
-        Constants.driver.L2().onTrue(new GoToPoseCommand(drivetrain, 17));
+        Constants.driver.L2().onTrue(new GoToPoseCommand(drivetrain, 8));
 
         // Constants.driver.R1().
         // Constants.driver.R1().onTrue(new ElevatorCommands(elevator, Constants.L0));
@@ -107,6 +110,8 @@ public class RobotContainer {
         Constants.driver.cross().onTrue(new ElevatorCommands(elevator, Constants.L2));
         Constants.driver.circle().onTrue(new ElevatorCommands(elevator, Constants.L3));
         Constants.driver.triangle().onTrue(new ElevatorCommands(elevator, Constants.L4));
+        Constants.driver.povDown().onTrue(ElevatorCommands.zeroSubsystems());
+        Constants.driver.povUp().onTrue(new InstantCommand(() -> ZeroElevator.stopZero()));
         // driver.L2().onTrue(Commands.runOnce(() -> elevator.zero(), elevator));
         // // driver.square().onTrue(new ElevatorCommands(elevator, 31.5));
         // // driver.circle().onTrue(new ElevatorCommands(elevator, 31.5));
