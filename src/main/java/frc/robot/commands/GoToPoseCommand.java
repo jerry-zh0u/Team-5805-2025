@@ -38,8 +38,8 @@ public class GoToPoseCommand extends Command  {
         pidControllerX.reset();
         pidControllerY.reset();
 
-        pidControllerX.setTolerance(0.2);//FIXME CHECK TO SEE IF VALID
-        pidControllerY.setTolerance(0.2);
+        pidControllerX.setTolerance(0.1);//FIXME CHECK TO SEE IF VALID
+        pidControllerY.setTolerance(0.1);
     }
 
     @Override

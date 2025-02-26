@@ -60,6 +60,8 @@ public final class Constants{
         public static final Transform3d ROBOT_TO_CAMERA = new Transform3d(new Translation3d(0, 0.375, 0.0762), new Rotation3d(0, 0, CAMERA_ANGLE)); //FIXME
     }
     public static class ElevatorConstants{
+        public static final int LIMITSWITCHID = 3;
+
         public static final int ELEVATORLEFTID = 5;
         public static final int ELEVATORRIGHTID = 6;
 
@@ -67,25 +69,25 @@ public final class Constants{
         public static final double ELEVATORBASESECONDHEIGHT = 25;
         public static final double INCHPERROTATION = (ELEVATORBASESECONDHEIGHT - ELEVATORBASEHEIGHT)/5;
 
+        public static final double MAXROTATIONS = 26; //FIXME
+
         public static TalonFXConfiguration ELEVATORCONFIG = new TalonFXConfiguration();
             static{                
                 ELEVATORCONFIG.MotorOutput.NeutralMode = NeutralModeValue.Brake;
                 // ELEVATORCONFIG.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
                 ELEVATORCONFIG.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-                ELEVATORCONFIG.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 67.5;
+                ELEVATORCONFIG.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 26;
                 ELEVATORCONFIG.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
                 ELEVATORCONFIG.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0;
 
                 ELEVATORCONFIG.Slot0.GravityType = GravityTypeValue.Elevator_Static;
 
-                // ELEVATORCONFIG.Feedback.SensorToMechanismRatio = 0.2; //FIXME THIS MAY BE 5
-
                 ELEVATORCONFIG.Slot0.kG = 0.3;
-                ELEVATORCONFIG.Slot0.kS = 0.4;
+                ELEVATORCONFIG.Slot0.kS = 0.48;
                 ELEVATORCONFIG.Slot0.kV = 0.001;
                 ELEVATORCONFIG.Slot0.kA = 0.0;
-                ELEVATORCONFIG.Slot0.kP = 0.5;
+                ELEVATORCONFIG.Slot0.kP = 0.65;
                 ELEVATORCONFIG.Slot0.kI = 0.0;
                 ELEVATORCONFIG.Slot0.kD = 0;
 
@@ -108,4 +110,8 @@ public final class Constants{
         public static final int MOTORONE = 13; //FIXEME
         public static final int MOTORTWO = 7; //FIXEME
     }
+    // public static class GroundIntake{
+    //     public static final int ROTATEMOTOR = ;
+    //     public static final int DRIVEMOTOR = ;
+    // }
 }

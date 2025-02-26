@@ -11,6 +11,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -19,6 +20,9 @@ public class ElevatorSubsystem extends SubsystemBase{
     private TalonFX leftMotorFollower, rightMotorMaster;
 
     private double lastPos;
+    private int onStall;
+
+    private DigitalInput limitSwitch;
 
     VoltageOut voltageRequest = new VoltageOut(0);
 
@@ -28,22 +32,26 @@ public class ElevatorSubsystem extends SubsystemBase{
         leftMotorFollower = new TalonFX(Constants.ElevatorConstants.ELEVATORLEFTID);
         rightMotorMaster = new TalonFX(Constants.ElevatorConstants.ELEVATORRIGHTID);
 
-        lastPos = 0;
+        lastPos = Constants.ElevatorConstants.ELEVATORBASEHEIGHT;
         motionRequest = new MotionMagicVoltage(0);
+
+        limitSwitch = new DigitalInput(Constants.ElevatorConstants.LIMITSWITCHID);
 
         rightMotorMaster.getConfigurator().apply(Constants.ElevatorConstants.ELEVATORCONFIG);
         leftMotorFollower.getConfigurator().apply(Constants.ElevatorConstants.ELEVATORCONFIG);
+
+        onStall = 0;
     }
 
     public void setPosition(double height){
         lastPos = height;
-        //CHECK THE UNITS
-        // rightMotorMaster.set(height);
+
         rightMotorMaster.setControl(motionRequest.withPosition(convertDistRotation(height)));
-        // rightMotorMaster.setControl(motionRequest.withPosition(10));
-
-
         leftMotorFollower.setControl(new Follower(rightMotorMaster.getDeviceID(), true));
+    }
+
+    public double getPosition(){
+        return rightMotorMaster.getPosition().getValueAsDouble();
     }
 
     public double getHeight(){
@@ -51,16 +59,18 @@ public class ElevatorSubsystem extends SubsystemBase{
     }
 
     public void zero(){
+        rightMotorMaster.setPosition(0.0);
+        leftMotorFollower.setPosition(0.0);
+
+        setVoltage(0);
+
         lastPos = Constants.ElevatorConstants.ELEVATORBASEHEIGHT;
         // rightMotorMaster.setControl(motionRequest.withPosition(convertDistRotation(lastPos)));
-        rightMotorMaster.setPosition(0.0);
         System.err.println("Zero Run" + " " + rightMotorMaster.getPosition().getValueAsDouble());
     }
 
     private double convertDistRotation(double height){
         return (height - Constants.ElevatorConstants.ELEVATORBASEHEIGHT)/Constants.ElevatorConstants.INCHPERROTATION;
-
-        // return 13.5 +5x = height
     }
 
     public void setMode(boolean coastMode){
@@ -73,11 +83,33 @@ public class ElevatorSubsystem extends SubsystemBase{
         }
     }
 
+    public void setVoltage(double amt){
+        rightMotorMaster.setControl(voltageRequest.withOutput(amt));
+        leftMotorFollower.setControl(voltageRequest.withOutput(amt));
+        // leftMotorFollower.setControl(new Follower(rightMotorMaster.getDeviceID(), true));
+    }
+
+    public boolean atBottom(){
+        return onStall >= 1;
+    }
+
+    public boolean getLimitSwitch(){
+        return limitSwitch.get();
+    }
+
     @Override
     public void periodic(){
         SmartDashboard.putNumber("Elevator Position", getHeight());
         SmartDashboard.putNumber("Elevator Desired Position", lastPos);
 
         SmartDashboard.putNumber("Raw Encoder Readings", rightMotorMaster.getPosition().getValueAsDouble());
+
+        if(rightMotorMaster.getSupplyCurrent().getValueAsDouble() > 3.5){
+            onStall++;
+        }else{
+            onStall = 0;
+        }
+
+        SmartDashboard.putNumber("Stall Counter", onStall);
     }
 }

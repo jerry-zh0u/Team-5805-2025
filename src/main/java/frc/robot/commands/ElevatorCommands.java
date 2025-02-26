@@ -23,7 +23,7 @@ public class ElevatorCommands extends Command{
 
     @Override
     public boolean isFinished(){
-        if(Math.abs(elevator.getHeight() - desiredDist) <= Constants.ElevatorConstants.ELEVATORDEADBAND){
+        if(elevator.getPosition() >= Constants.ElevatorConstants.MAXROTATIONS || Math.abs(elevator.getHeight() - desiredDist) <= Constants.ElevatorConstants.ELEVATORDEADBAND){
             System.err.println("+++++ Finished");
             return true;
         }
