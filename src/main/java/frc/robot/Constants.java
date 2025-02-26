@@ -60,6 +60,8 @@ public final class Constants{
         public static final Transform3d ROBOT_TO_CAMERA = new Transform3d(new Translation3d(0, 0.375, 0.0762), new Rotation3d(0, 0, CAMERA_ANGLE)); //FIXME
     }
     public static class ElevatorConstants{
+        public static final int LIMITSWITCHID = 3;
+
         public static final int ELEVATORLEFTID = 5;
         public static final int ELEVATORRIGHTID = 6;
 
@@ -67,13 +69,15 @@ public final class Constants{
         public static final double ELEVATORBASESECONDHEIGHT = 25;
         public static final double INCHPERROTATION = (ELEVATORBASESECONDHEIGHT - ELEVATORBASEHEIGHT)/5;
 
+        public static final double MAXROTATIONS = 26; //FIXME
+
         public static TalonFXConfiguration ELEVATORCONFIG = new TalonFXConfiguration();
             static{                
                 ELEVATORCONFIG.MotorOutput.NeutralMode = NeutralModeValue.Brake;
                 // ELEVATORCONFIG.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
                 ELEVATORCONFIG.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-                ELEVATORCONFIG.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 67.5;
+                ELEVATORCONFIG.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 26;
                 ELEVATORCONFIG.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
                 ELEVATORCONFIG.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0;
 
@@ -89,8 +93,8 @@ public final class Constants{
                 ELEVATORCONFIG.Slot0.kI = 0.0;
                 ELEVATORCONFIG.Slot0.kD = 0;
 
-                ELEVATORCONFIG.MotionMagic.MotionMagicCruiseVelocity = 100;// using 100 nonr 125 some 200 some
-                ELEVATORCONFIG.MotionMagic.MotionMagicAcceleration = 100;
+                ELEVATORCONFIG.MotionMagic.MotionMagicCruiseVelocity = 25;// using 100 nonr 125 some 200 some
+                ELEVATORCONFIG.MotionMagic.MotionMagicAcceleration = 50;
                 ELEVATORCONFIG.MotionMagic.MotionMagicExpo_kV = 0.5;
                 // ELEVATORCONFIG.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseClosedLoopSign;
             }
@@ -108,4 +112,8 @@ public final class Constants{
         public static final int MOTORONE = 13; //FIXEME
         public static final int MOTORTWO = 7; //FIXEME
     }
+    // public static class GroundIntake{
+    //     public static final int ROTATEMOTOR = ;
+    //     public static final int DRIVEMOTOR = ;
+    // }
 }

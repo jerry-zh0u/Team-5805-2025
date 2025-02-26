@@ -1,45 +1,35 @@
 package frc.robot.commands;
 
-import com.ctre.phoenix6.controls.Follower;
+import static edu.wpi.first.units.Units.Inches;
 
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import frc.robot.Constants;
 import frc.robot.subsystems.ElevatorSubsystem;
 
 public class ZeroElevator extends Command{
-    private static ElevatorSubsystem elevatorSubsystem = ElevatorSubsystem.getInstance();
+    private ElevatorSubsystem elevator;
 
-    //     public static Command zeroElevator() {
-    //     return new FunctionalCommand(
-    //             () -> elevatorSubsystem.rightMotorMaster.setVoltage(-2),
-    //             () -> {
-    //             },
-    //             (interrupted) -> {
-    //                 elevatorSubsystem.setVoltage(0);
-    //             },
-    //             elevatorSubsystem::isAtBottom,
-    //             elevatorSubsystem
-    //     );
-    // }
-    
+    public ZeroElevator(ElevatorSubsystem _elevator){
+        this.elevator = _elevator;
+    }
+
     @Override
     public void execute(){
-        elevatorSubsystem.rightMotorMaster.setVoltage(-2);
-        elevatorSubsystem.leftMotorFollower.setControl(new Follower(elevatorSubsystem.rightMotorMaster.getDeviceID(), true));
-    }
-    public static void stopZero(){
-        elevatorSubsystem.rightMotorMaster.setVoltage(0);
-        elevatorSubsystem.leftMotorFollower.setControl(new Follower(elevatorSubsystem.rightMotorMaster.getDeviceID(), true));
-        elevatorSubsystem.setPosition(0);
-    }
-
-    @Override
-    public void end(boolean interrupted){
-        elevatorSubsystem.setVoltage(0);
+        elevator.setVoltage(-1.5);
     }
 
     @Override
     public boolean isFinished(){
-        return elevatorSubsystem.isAtBottom();
+        return elevator.atBottom()/* || elevator.getLimitSwitch()*/;
+    }
+
+    @Override
+    public void end(boolean interrupted){
+
+        System.err.println("Elevator has zeroed");
+
+        elevator.setVoltage(0);
+        elevator.zero();
     }
 }

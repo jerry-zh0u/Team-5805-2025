@@ -9,6 +9,7 @@ import frc.robot.commands.AutoCoralManipulator;
 import frc.robot.commands.ClimbCommands;
 import frc.robot.commands.CoralManipulatorGo;
 import frc.robot.commands.ElevatorCommands;
+import frc.robot.commands.ZeroElevator;
 import frc.robot.commands.GoToPoseCommand;
 import frc.robot.commands.WaitCommand;
 import frc.robot.commands.ZeroElevator;
@@ -31,6 +32,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -74,7 +76,11 @@ public class RobotContainer {
         NamedCommands.registerCommand("L2", new ElevatorCommands(elevator, Constants.L2));
         NamedCommands.registerCommand("L3", new ElevatorCommands(elevator, Constants.L3));
         NamedCommands.registerCommand("L4", new ElevatorCommands(elevator, Constants.L4));
-        NamedCommands.registerCommand("EJECT", new SequentialCommandGroup(new CoralManipulatorGo(coralManip, -1), new WaitCommand(1), new CoralManipulatorGo(coralManip, 0)));
+        NamedCommands.registerCommand("EJECT", new SequentialCommandGroup(
+                                                        new CoralManipulatorGo(coralManip, -1), 
+                                                        new WaitCommand(1), 
+                                                        new CoralManipulatorGo(coralManip, 0))
+                                                    );
         // NamedCommands.registerCommand("EJECT", new AutoCoralManipulator(coralManip, -1));
 
         configureBindings();
@@ -100,10 +106,11 @@ public class RobotContainer {
 
         // driver.rightBumper().whileTrue(drivetrain.applyRequest(() -> drivetrain.CameraGoToTag(-driver.getLeftY() * MaxSpeed, -driver.getLeftX() * MaxSpeed, -driver.getRightX() * MaxAngularRate, drive)));
         // driver.L2().toggleOnTrue(new GoToPoseCommand(drivetrain, 7));
-        Constants.driver.L2().onTrue(new GoToPoseCommand(drivetrain, 8));
-
+        Constants.driver.L2().whileTrue(new GoToPoseCommand(drivetrain, 8));
+        Constants.driver.L1().onTrue(new ZeroElevator(elevator));
+        // Constants.driver.L1().onTrue(new SequentialCommandGroup(new ElevatorCommands(elevator, 25), new WaitCommand(0.2), new ElevatorCommands(elevator, Constants.ElevatorConstants.ELEVATORBASEHEIGHT)));
         // Constants.driver.R1().
-        // Constants.driver.R1().onTrue(new ElevatorCommands(elevator, Constants.L0));
+        // Constants.driver.L1().onTrue(new ElevatorCommands(elevator, 25).andThen(new WaitCommand(0.2).andThen(new ElevatorCommands(elevator, Constants.ElevatorConstants.ELEVATORBASEHEIGHT))));
         // Constants.driver.L1().onTrue(new ElevatorCommands(elevator, Constants.L4));
         Constants.driver.square().onTrue(new ElevatorCommands(elevator, Constants.L1));
         // Constants.driver.L1().onTrue(new ElevatorCommands(elevator, Constants.L1));
