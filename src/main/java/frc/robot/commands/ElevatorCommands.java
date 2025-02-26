@@ -13,7 +13,7 @@ import frc.robot.subsystems.ElevatorSubsystem;
 
 
 public class ElevatorCommands extends Command{
-    private static ElevatorSubsystem elevatorSubsystem = ElevatorSubsystem.getInstance();
+    private static ElevatorSubsystem elevatorSubsystem;
     private double desiredDist;
 
     public ElevatorCommands(ElevatorSubsystem _elevator, double height){
@@ -28,20 +28,11 @@ public class ElevatorCommands extends Command{
 
     @Override
     public boolean isFinished(){
-        if(elevator.getPosition() >= Constants.ElevatorConstants.MAXROTATIONS || Math.abs(elevator.getHeight() - desiredDist) <= Constants.ElevatorConstants.ELEVATORDEADBAND){
+        if(elevatorSubsystem.getPosition() >= Constants.ElevatorConstants.MAXROTATIONS || Math.abs(elevatorSubsystem.getHeight() - desiredDist) <= Constants.ElevatorConstants.ELEVATORDEADBAND){
             System.err.println("+++++ Finished");
             return true;
         }
         return false;
-    }
-
-    
-    public static Command zeroSubsystems() {
-        return new SequentialCommandGroup(
-                new ZeroElevator(),
-                new WaitCommand(.3),
-                new InstantCommand(() -> elevatorSubsystem.setPosition(15))
-        );
     }
 }
 
