@@ -60,7 +60,7 @@ public class RobotContainer {
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
     // public final ElevatorSubsystem elevator = new ElevatorSubsystem();
-    public static final ElevatorSubsystem elevator = new ElevatorSubsystem();
+    public final ElevatorSubsystem elevator = new ElevatorSubsystem();
 
     public final CoralManipulator coralManip = new CoralManipulator();
 
@@ -132,9 +132,9 @@ public class RobotContainer {
         opereator.L1().whileTrue(new ClimbCommands(climb, -1));
         opereator.L1().whileFalse(new ClimbCommands(climb, 0));
 
-        Constants.driver.R1().whileTrue(new CoralManipulatorGo(coralManip, 1));
+        Constants.driver.R1().whileTrue(new CoralManipulatorGo(coralManip, 0.8));
         Constants.driver.R1().whileFalse(new CoralManipulatorGo(coralManip, 0));
-        Constants.driver.R2().whileTrue(new CoralManipulatorGo(coralManip, -1));
+        Constants.driver.R2().whileTrue(new CoralManipulatorGo(coralManip, -0.8));
         Constants.driver.R2().whileFalse(new CoralManipulatorGo(coralManip, 0));
 
         // driver.a().whileTrue(drivetrain.applyRequest(() -> brake));

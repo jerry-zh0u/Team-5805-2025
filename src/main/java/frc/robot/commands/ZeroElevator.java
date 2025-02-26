@@ -28,7 +28,7 @@ public class ZeroElevator extends Command{
     public void end(boolean interrupted){
 
         System.err.println("Elevator has zeroed");
-
+        
         elevator.setVoltage(0);
         elevator.zero();
     }

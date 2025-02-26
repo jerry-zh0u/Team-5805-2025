@@ -30,6 +30,8 @@ public class ElevatorSubsystem extends SubsystemBase{
     private int currentSpike;
     private int noCurrentSpike;
 
+    private boolean zeroed;
+
     VoltageOut voltageRequest = new VoltageOut(0);
 
     MotionMagicVoltage motionRequest;
@@ -43,6 +45,7 @@ public class ElevatorSubsystem extends SubsystemBase{
 
         lastPos = Constants.ElevatorConstants.ELEVATORBASEHEIGHT;
         motionRequest = new MotionMagicVoltage(0);
+        zeroed = true;
 
         // leftmotorfollower.set(Follower, rightMotorMaster);
         // leftMotorFollower.setControl(new Follower(rightMotorMaster.getDeviceID(), true));
@@ -127,6 +130,16 @@ public class ElevatorSubsystem extends SubsystemBase{
 
         SmartDashboard.putNumber("Raw Encoder Readings", rightMotorMaster.getPosition().getValueAsDouble());
 
+        SmartDashboard.putBoolean("Limit Switch", getLimitSwitch());
+
+        if(limitSwitch.get()){
+            if(!zeroed){
+                zeroed = true;
+                zero();
+            }
+        }else{
+            zeroed = false;
+        }
         // if(rightMotorMaster.getSupplyCurrent().getValueAsDouble() > 3.5){
         //     onStall++;
         // }else{

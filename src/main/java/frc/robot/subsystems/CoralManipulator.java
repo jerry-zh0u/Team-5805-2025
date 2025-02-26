@@ -15,7 +15,7 @@ public class CoralManipulator extends SubsystemBase{
 
     public CoralManipulator(){
         bagMotor = new TalonSRX(Constants.CoralManipulatorConstants.BAGMOTOR);
-        beamBreak = new DigitalInput(0);
+        // beamBreak = new DigitalInput(0);
     }
 
     public void setSpeed(double speed){

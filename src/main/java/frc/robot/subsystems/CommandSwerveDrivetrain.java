@@ -339,22 +339,22 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         if(!results.isEmpty()){
             cur = results.get(results.size() - 1);
             
-            var best = cur.getBestTarget();
-            if(best != null){
-                var bestID = best.getFiducialId();
+            // var best = cur.getBestTarget();
+            // if(best != null){
+            //     var bestID = best.getFiducialId();
 
-                // System.err.println(bestID + " ==== Found");
+            //     // System.err.println(bestID + " ==== Found");
 
-                Optional<Pose3d> tagPose = layout.getTagPose(bestID);
-                if(best.getPoseAmbiguity() <= 0.2 && bestID >= 0 && tagPose.isPresent()){
-                    var targetPose = tagPose.get();
-                    Transform3d camToTarget = best.getBestCameraToTarget();
-                    Pose3d camPose = targetPose.transformBy(camToTarget.inverse());
+            //     Optional<Pose3d> tagPose = layout.getTagPose(bestID);
+            //     if(best.getPoseAmbiguity() <= 0.2 && bestID >= 0 && tagPose.isPresent()){
+            //         var targetPose = tagPose.get();
+            //         Transform3d camToTarget = best.getBestCameraToTarget();
+            //         Pose3d camPose = targetPose.transformBy(camToTarget.inverse());
     
-                    var visionMeasure = camPose.transformBy(Constants.PhotonVisionConstants.CAMERA_TO_ROBOT);
-                    addVisionMeasurement(visionMeasure.toPose2d(), timestamp);
-                }
-            }
+            //         var visionMeasure = camPose.transformBy(Constants.PhotonVisionConstants.CAMERA_TO_ROBOT);
+            //         addVisionMeasurement(visionMeasure.toPose2d(), timestamp);
+            //     }
+            // }
         }
 
             // if(cur.getMultiTagResult().estimatedPose.isPresent){

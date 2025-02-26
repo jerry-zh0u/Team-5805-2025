@@ -20,17 +20,21 @@ public class GoToPoseCommand extends Command  {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
 
     private final CommandSwerveDrivetrain drivetrain;
-    private final PIDController pidControllerX = new PIDController(.05, 0, 0); // TODO tune
-    private final PIDController pidControllerY = new  PIDController(.5, 0, 0); // TODO tune
+    private final PIDController pidControllerX = new PIDController(9, 0, 0); // TODO tune
+    private final PIDController pidControllerY = new  PIDController(9, 0, 0); // TODO tune
     // private final PIDController pidControllerZ = new PIDController(.2, 0, 0);
     // private final PIDController pidControllerZ = new PIDController(50, 0, 0.2);
     private PhotonPipelineResult cur = new PhotonPipelineResult();
+
+    private boolean finished;
 
     private final int tagID;
 
     public GoToPoseCommand(CommandSwerveDrivetrain drivetrain, int tagID) {
         this.drivetrain = drivetrain;
         this.tagID = tagID;
+
+        finished = false;
     }
 
     @Override
@@ -38,17 +42,17 @@ public class GoToPoseCommand extends Command  {
         pidControllerX.reset();
         pidControllerY.reset();
 
-        pidControllerX.setTolerance(0.1);//FIXME CHECK TO SEE IF VALID
-        pidControllerY.setTolerance(0.1);
+        pidControllerX.setTolerance(0.05);//FIXME CHECK TO SEE IF VALID
+        pidControllerY.setTolerance(0.05);
     }
 
     @Override
     public void execute() {
-        System.err.println("Pose Called");
+        // System.err.println("Pose Called");
         cur = drivetrain.getPhotonResult();
         // System.err.println(cur);
         if(cur != null){
-            // System.err.println("++++");
+            System.err.println("++++");
             if(cur.hasTargets()){
                 for(var target : cur.getTargets()) {
                     // if(target.getFiducialId() == 7){
@@ -93,7 +97,9 @@ public class GoToPoseCommand extends Command  {
 
                     // If the camera to target is field relative
                     // The following works for all tags
+                    System.err.println("Target Tracked");
                     if(target.getFiducialId() == tagID) {
+                        System.err.println("ID Found");
                         double curDistX = target.bestCameraToTarget.getX();
                         double curDistY = target.getYaw();
 
@@ -136,7 +142,13 @@ public class GoToPoseCommand extends Command  {
         // if(pidControllerX.atSetpoint() && pidControllerY.atSetpoint()){
         //     return true;
         // }
-        if(pidControllerY.atSetpoint() || cur.getTargets().isEmpty()){
+        if(cur != null){
+            if(cur.getTargets().isEmpty()){
+                finished = true;
+            }
+        }
+        if(pidControllerY.atSetpoint() || finished){
+            System.err.println("Finished");
             return true;
         }
         return false;

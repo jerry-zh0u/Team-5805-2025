@@ -29,9 +29,9 @@ public final class Constants{
 
     public static final double L0 = ElevatorConstants.ELEVATORBASEHEIGHT;
     public static final double L1 = 21;
-    public static final double L2 = 30.2;
-    public static final double L3 = 45;
-    public static final double L4 = 67;
+    public static final double L2 = 30.5; //31.25
+    public static final double L3 = 45.25;
+    public static final double L4 = 66.9;
     /*
      * joystick.triangle().onTrue(new ElevatorCommands(elevator, 14.5));
         joystick.circle().onTrue(new ElevatorCommands(elevator, 20));
@@ -60,7 +60,7 @@ public final class Constants{
         public static final Transform3d ROBOT_TO_CAMERA = new Transform3d(new Translation3d(0, 0.375, 0.0762), new Rotation3d(0, 0, CAMERA_ANGLE)); //FIXME
     }
     public static class ElevatorConstants{
-        public static final int LIMITSWITCHID = 3;
+        public static final int LIMITSWITCHID = 0;
 
         public static final int ELEVATORLEFTID = 5;
         public static final int ELEVATORRIGHTID = 6;
@@ -103,7 +103,7 @@ public final class Constants{
                 ELEVATOR_COAST_CONFIG.MotorOutput.NeutralMode = NeutralModeValue.Coast;
             }
 
-        public static final double ELEVATORDEADBAND = 0.7;
+        public static final double ELEVATORDEADBAND = 0.5;
     }
     public static class CoralManipulatorConstants{
         public static final int BAGMOTOR = 10; 
