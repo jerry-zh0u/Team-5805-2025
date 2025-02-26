@@ -41,21 +41,12 @@ public class ElevatorSubsystem extends SubsystemBase{
 
         configureFollowerMotor(Constants.ElevatorConstants.ELEVATORLEFTID, true);
 
-        lastPos = 15;
+        lastPos = Constants.ElevatorConstants.ELEVATORBASEHEIGHT;
         motionRequest = new MotionMagicVoltage(0);
 
         // leftmotorfollower.set(Follower, rightMotorMaster);
         // leftMotorFollower.setControl(new Follower(rightMotorMaster.getDeviceID(), true));
         // leftMotorFollower.getConfigurator().apply(Constants.ElevatorConstants.ELEVATORCONFIG);
-    }
-
-    public void configureFollowerMotor(int followerMotorId, boolean opposeMasterDirection) {
-        leftMotorFollower = new TalonFX(followerMotorId);
-        follower = new Follower(rightMotorMaster.getDeviceID(), opposeMasterDirection);
-
-        leftMotorFollower.setControl(follower);
-        lastPos = Constants.ElevatorConstants.ELEVATORBASEHEIGHT;
-        motionRequest = new MotionMagicVoltage(0);
 
         limitSwitch = new DigitalInput(Constants.ElevatorConstants.LIMITSWITCHID);
 
@@ -63,6 +54,13 @@ public class ElevatorSubsystem extends SubsystemBase{
 //         leftMotorFollower.getConfigurator().apply(Constants.ElevatorConstants.ELEVATORCONFIG);
 
         onStall = 0;
+    }
+
+    public void configureFollowerMotor(int followerMotorId, boolean opposeMasterDirection) {
+        leftMotorFollower = new TalonFX(followerMotorId);
+        follower = new Follower(rightMotorMaster.getDeviceID(), opposeMasterDirection);
+
+        leftMotorFollower.setControl(follower);
     }
 
     public void setPosition(double height){
@@ -90,9 +88,9 @@ public class ElevatorSubsystem extends SubsystemBase{
         System.err.println("Zero Run" + " " + rightMotorMaster.getPosition().getValueAsDouble());
     }
 
-    public void setVoltage(double output) {
-        rightMotorMaster.setVoltage(output);
-    }
+    // public void setVoltage(double output) {
+    //     rightMotorMaster.setVoltage(output);
+    // }
 
     private double convertDistRotation(double height){
         return (height - Constants.ElevatorConstants.ELEVATORBASEHEIGHT)/Constants.ElevatorConstants.INCHPERROTATION;
@@ -110,7 +108,7 @@ public class ElevatorSubsystem extends SubsystemBase{
 
     public void setVoltage(double amt){
         rightMotorMaster.setControl(voltageRequest.withOutput(amt));
-        leftMotorFollower.setControl(voltageRequest.withOutput(amt));
+        // leftMotorFollower.setControl(voltageRequest.withOutput(amt));
         // leftMotorFollower.setControl(new Follower(rightMotorMaster.getDeviceID(), true));
     }
 

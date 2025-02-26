@@ -60,7 +60,7 @@ public class RobotContainer {
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
     // public final ElevatorSubsystem elevator = new ElevatorSubsystem();
-    public static final ElevatorSubsystem elevator = ElevatorSubsystem.getInstance();
+    public static final ElevatorSubsystem elevator = new ElevatorSubsystem();
 
     public final CoralManipulator coralManip = new CoralManipulator();
 
@@ -117,8 +117,8 @@ public class RobotContainer {
         Constants.driver.cross().onTrue(new ElevatorCommands(elevator, Constants.L2));
         Constants.driver.circle().onTrue(new ElevatorCommands(elevator, Constants.L3));
         Constants.driver.triangle().onTrue(new ElevatorCommands(elevator, Constants.L4));
-        Constants.driver.povDown().onTrue(ElevatorCommands.zeroSubsystems());
-        Constants.driver.povUp().onTrue(new InstantCommand(() -> ZeroElevator.stopZero()));
+        // Constants.driver.povDown().onTrue(ElevatorCommands.zeroSubsystems());
+        // Constants.driver.povUp().onTrue(new InstantCommand(() -> ZeroElevator.stopZero()));
         // driver.L2().onTrue(Commands.runOnce(() -> elevator.zero(), elevator));
         // // driver.square().onTrue(new ElevatorCommands(elevator, 31.5));
         // // driver.circle().onTrue(new ElevatorCommands(elevator, 31.5));
