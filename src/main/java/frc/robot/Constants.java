@@ -103,7 +103,7 @@ public final class Constants{
                 ELEVATOR_COAST_CONFIG.MotorOutput.NeutralMode = NeutralModeValue.Coast;
             }
 
-        public static final double ELEVATORDEADBAND = 2;
+        public static final double ELEVATORDEADBAND = 0.7;
     }
     public static class CoralManipulatorConstants{
         public static final int BAGMOTOR = 10; 

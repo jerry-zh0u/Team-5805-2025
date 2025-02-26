@@ -23,7 +23,7 @@ public class ElevatorSubsystem extends SubsystemBase{
     private Follower follower;
 
     private double lastPos;
-    private int onStall;
+    // private int onStall;
 
     private DigitalInput limitSwitch;
 
@@ -53,7 +53,7 @@ public class ElevatorSubsystem extends SubsystemBase{
         rightMotorMaster.getConfigurator().apply(Constants.ElevatorConstants.ELEVATORCONFIG);
 //         leftMotorFollower.getConfigurator().apply(Constants.ElevatorConstants.ELEVATORCONFIG);
 
-        onStall = 0;
+        // onStall = 0;
     }
 
     public void configureFollowerMotor(int followerMotorId, boolean opposeMasterDirection) {
@@ -112,9 +112,9 @@ public class ElevatorSubsystem extends SubsystemBase{
         // leftMotorFollower.setControl(new Follower(rightMotorMaster.getDeviceID(), true));
     }
 
-    public boolean atBottom(){
-        return onStall >= 1;
-    }
+    // public boolean atBottom(){
+    //     return onStall >= 1;
+    // }
 
     public boolean getLimitSwitch(){
         return limitSwitch.get();
@@ -127,12 +127,12 @@ public class ElevatorSubsystem extends SubsystemBase{
 
         SmartDashboard.putNumber("Raw Encoder Readings", rightMotorMaster.getPosition().getValueAsDouble());
 
-        if(rightMotorMaster.getSupplyCurrent().getValueAsDouble() > 3.5){
-            onStall++;
-        }else{
-            onStall = 0;
-        }
+        // if(rightMotorMaster.getSupplyCurrent().getValueAsDouble() > 3.5){
+        //     onStall++;
+        // }else{
+        //     onStall = 0;
+        // }
 
-        SmartDashboard.putNumber("Stall Counter", onStall);
+        // SmartDashboard.putNumber("Stall Counter", onStall);
     }
 }

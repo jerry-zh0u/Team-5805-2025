@@ -21,7 +21,7 @@ public class ZeroElevator extends Command{
 
     @Override
     public boolean isFinished(){
-        return elevator.atBottom()/* || elevator.getLimitSwitch()*/;
+        return elevator.getLimitSwitch();
     }
 
     @Override
