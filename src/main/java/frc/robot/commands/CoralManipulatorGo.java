@@ -21,6 +21,7 @@ public class CoralManipulatorGo extends Command {
 
     @Override
     public boolean isFinished(){
+        System.err.println("Coral Manipulator is Finished");
         return true;
     } 
 }

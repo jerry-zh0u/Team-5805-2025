@@ -12,43 +12,39 @@ import frc.robot.Constants;
 import frc.robot.subsystems.ElevatorSubsystem;
 
 
-public class ElevatorCommands extends Command{
+public class ElevatorBounce extends Command{
     private ElevatorSubsystem elevatorSubsystem;
     private double desiredDist;
-    // private boolean finished;
+    private static int count = 0;
 
-    public ElevatorCommands(ElevatorSubsystem _elevator, double height){
+    public ElevatorBounce(ElevatorSubsystem _elevator, double height){
         this.elevatorSubsystem = _elevator;
         this.desiredDist = height;
-        // finished = false;
     }
 
     @Override
     public void execute(){
-        // System.err.println("Elevator Run");
-        // finished = false;
-        elevatorSubsystem.setPosition(desiredDist);
+        count = 0;
+
+        new ElevatorCommands(elevatorSubsystem, desiredDist - 2);
+        new ElevatorCommands(elevatorSubsystem, desiredDist + 2);
+        new ElevatorCommands(elevatorSubsystem, desiredDist);
+        isFinished();
+
+        count++;
     }
 
     @Override
     public boolean isFinished(){
-        if(elevatorSubsystem.getPosition() >= Constants.ElevatorConstants.MAXROTATIONS || Math.abs(elevatorSubsystem.getHeight() - desiredDist) <= Constants.ElevatorConstants.ELEVATORDEADBAND){
-            System.err.println("+++++ Finished");
-            // finished = true;
+        if(count >= 1){
             return true;
         }
         return false;
     }
-    // @Override
-    // public void periodic(){
+}
 
-    // }
-// }
-
-
-//Cp,ommadnw
     // @Override
     // public void end(boolean interrupted){
-    //     // return true;
+    //     return true;
     // }
-}
+// }

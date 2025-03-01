@@ -83,7 +83,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public static final Field2d _field = new Field2d();
     private AprilTagFieldLayout layout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
     private PhotonCamera cam = Constants.PhotonVisionConstants.m_Camera;
-    private PhotonPoseEstimator camPoseEstimator = new PhotonPoseEstimator( layout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, Constants.PhotonVisionConstants.ROBOT_TO_CAMERA); // TODO Jerry, test different pose strageies. In general just use multitag
+    // private PhotonPoseEstimator camPoseEstimator = new PhotonPoseEstimator( layout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, Constants.PhotonVisionConstants.ROBOT_TO_CAMERA); // TODO Jerry, test different pose strageies. In general just use multitag
 
     private static PhotonPipelineResult cur = null;
 
@@ -244,13 +244,15 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 ),
                 new PPHolonomicDriveController(
                     // PID constants for translation
-                    new PIDConstants(10, 0, 0),
+                    new PIDConstants(0, 0, 0),
                     // PID constants for rotation
                     new PIDConstants(5, 0, 0)
                 ),
                 config,
                 // Assume the path needs to be flipped for Red vs Blue, this is normally the case
-                () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
+                () -> false,
+                // () -> (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get().equals(Alliance.Red))/*DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red*/,
+                // () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
                 this // Subsystem for requirements
             );
         } catch (Exception ex) {
@@ -334,7 +336,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             //     addVisionMeasurement(photonEstimate.estimatedPose.toPose2d(), photonEstimate.timestampSeconds);
             // }
             // var results = cam.getAllUnreadResults();
-            var timestamp = Utils.getCurrentTimeSeconds();
+            // var timestamp = Utils.getCurrentTimeSeconds();
 
         if(!results.isEmpty()){
             cur = results.get(results.size() - 1);
@@ -396,47 +398,47 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         });
         m_simNotifier.startPeriodic(kSimLoopPeriod);
     }
-    public SwerveRequest CameraGoToTag(double forward, double strafe, double turn, SwerveRequest.FieldCentric drive){     
-        // TODO spend more time discussing other approaches to alignment code using odometry instead of raw vision data (Jerry + Ryan)           
-        if(cur != null){
-            if(cur.hasTargets()){
-                PIDController pidControllerX = new PIDController(50, 0, 0.2); // TODO tune
-                PIDController pidControllerY = new  PIDController(50, 0, 0.2); // TODO tune
-                for(var target : cur.getTargets()) {
-                    if (target.getFiducialId() == 7) {
-                        // THIS SHOULD WORK FOR ALL APRILTAGS if bestCameraToTarget is robot relative
-                        var xy = new Translation2d(target.bestCameraToTarget.getX(), target.bestCameraToTarget.getY());// assumes bestCameraToTarget is robot relative
-                        var rotated = xy.rotateBy(Rotation2d.fromDegrees(360.0 -  getStateCopy().RawHeading.getDegrees()));
+    // public SwerveRequest CameraGoToTag(double forward, double strafe, double turn, SwerveRequest.FieldCentric drive){     
+    //     // TODO spend more time discussing other approaches to alignment code using odometry instead of raw vision data (Jerry + Ryan)           
+    //     if(cur != null){
+    //         if(cur.hasTargets()){
+    //             PIDController pidControllerX = new PIDController(50, 0, 0.2); // TODO tune
+    //             PIDController pidControllerY = new  PIDController(50, 0, 0.2); // TODO tune
+    //             for(var target : cur.getTargets()) {
+    //                 if (target.getFiducialId() == 7) {
+    //                     // THIS SHOULD WORK FOR ALL APRILTAGS if bestCameraToTarget is robot relative
+    //                     var xy = new Translation2d(target.bestCameraToTarget.getX(), target.bestCameraToTarget.getY());// assumes bestCameraToTarget is robot relative
+    //                     var rotated = xy.rotateBy(Rotation2d.fromDegrees(360.0 -  getStateCopy().RawHeading.getDegrees()));
 
-                        // forward = pidControllerX.calculate(rotated.getX(), Constants.PhotonVisionConstants.DES_HUMAN_DISTANCEX);
-                        strafe = pidControllerY.calculate(rotated.getY(), Constants.PhotonVisionConstants.DES_HUMAN_DISTANCEY);
-                        return new SwerveRequest.FieldCentricFacingAngle()
-                            .withVelocityX(forward) // for tag 7, robot forward = negative x
-                            .withVelocityY(strafe) // For tag 7, robot right = positive y
-                            .withTargetDirection(Rotation2d.fromDegrees(target.getYaw() + 180.0));
-                    }
+    //                     // forward = pidControllerX.calculate(rotated.getX(), Constants.PhotonVisionConstants.DES_HUMAN_DISTANCEX);
+    //                     strafe = pidControllerY.calculate(rotated.getY(), Constants.PhotonVisionConstants.DES_HUMAN_DISTANCE_Y_LEFT);
+    //                     return new SwerveRequest.FieldCentricFacingAngle()
+    //                         .withVelocityX(forward) // for tag 7, robot forward = negative x
+    //                         .withVelocityY(strafe) // For tag 7, robot right = positive y
+    //                         .withTargetDirection(Rotation2d.fromDegrees(target.getYaw() + 180.0));
+    //                 }
 
-                    // // If the camera to target is field relative
-                    // // The following works for all tags
-                    // if(target.getFiducialId() == 7) {
-                    //     double curDistX = target.bestCameraToTarget.getX(); // assumes bestCameraToTarget is field relative
-                    //     double curDistY = target.bestCameraToTarget.getY(); // assumes bestCameraToTarget is field relative
+    //                 // // If the camera to target is field relative
+    //                 // // The following works for all tags
+    //                 // if(target.getFiducialId() == 7) {
+    //                 //     double curDistX = target.bestCameraToTarget.getX(); // assumes bestCameraToTarget is field relative
+    //                 //     double curDistY = target.bestCameraToTarget.getY(); // assumes bestCameraToTarget is field relative
 
-                    //     forward = pidControllerX.calculate(curDistX, Constants.PhotonVisionConstants.DES_HUMAN_DISTANCEX);
-                    //     strafe = pidControllerY.calculate(curDistY, Constants.PhotonVisionConstants.DES_HUMAN_DISTANCEY);
-                    //     return new SwerveRequest.FieldCentricFacingAngle()
-                    //         .withVelocityX(forward) // for tag 7, robot forward = negative x
-                    //         .withVelocityY(strafe) // For tag 7, robot right = positive y
-                    //         .withTargetDirection(Rotation2d.fromDegrees(180));
-                    // }
-                }
-            }
-        }
+    //                 //     forward = pidControllerX.calculate(curDistX, Constants.PhotonVisionConstants.DES_HUMAN_DISTANCEX);
+    //                 //     strafe = pidControllerY.calculate(curDistY, Constants.PhotonVisionConstants.DES_HUMAN_DISTANCEY);
+    //                 //     return new SwerveRequest.FieldCentricFacingAngle()
+    //                 //         .withVelocityX(forward) // for tag 7, robot forward = negative x
+    //                 //         .withVelocityY(strafe) // For tag 7, robot right = positive y
+    //                 //         .withTargetDirection(Rotation2d.fromDegrees(180));
+    //                 // }
+    //             }
+    //         }
+    //     }
 
-        return drive.withVelocityX(forward)
-                    .withVelocityY(strafe)
-                    .withRotationalRate(turn);
-    }
+    //     return drive.withVelocityX(forward)
+    //                 .withVelocityY(strafe)
+    //                 .withRotationalRate(turn);
+    // }
 
     public PhotonPipelineResult getPhotonResult() {
         return cur;

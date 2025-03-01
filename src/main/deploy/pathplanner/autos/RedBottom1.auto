@@ -11,7 +11,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "TopBargeToReefLeft1"
+                  "pathName": "RBottomBargeToLeftCoral1"
                 }
               },
               {
@@ -36,7 +36,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "TopReefLeft1ToHuman"
+                  "pathName": "RBottomLeftCoral1ToHuman"
                 }
               },
               {
@@ -61,13 +61,13 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "TopHumanToReefLeft2"
+                  "pathName": "RHumanToLeftCoral2"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "L4"
+                  "name": "L2"
                 }
               }
             ]
@@ -86,7 +86,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "TopReefLeft2ToHuman"
+                  "pathName": "RLeftCoral2ToHuman"
                 }
               },
               {
@@ -111,13 +111,13 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "TopHumanToReefRight3"
+                  "pathName": "RHumanToRightCoral3"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "L4"
+                  "name": "L2"
                 }
               }
             ]
@@ -127,50 +127,6 @@
           "type": "named",
           "data": {
             "name": "EJECT"
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "TopReefRight3ToHuman"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "BASE"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.5
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "TopHumanReefLeft4"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "L4"
-                }
-              }
-            ]
           }
         },
         {

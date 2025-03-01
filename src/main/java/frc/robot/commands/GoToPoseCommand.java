@@ -1,9 +1,12 @@
 package frc.robot.commands;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import org.photonvision.PhotonUtils;
 import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
@@ -11,6 +14,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.generated.TunerConstants;
@@ -18,32 +22,36 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 
 public class GoToPoseCommand extends Command  {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
+    private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
     private final CommandSwerveDrivetrain drivetrain;
-    private final PIDController pidControllerX = new PIDController(9, 0, 0); // TODO tune
-    private final PIDController pidControllerY = new  PIDController(9, 0, 0); // TODO tune
+    // private final PIDController pidControllerX = new PIDController(10, 0, 0); // TODO tune
+    private final PIDController pidControllerY = new  PIDController(7, 0, 0); // TODO tune
     // private final PIDController pidControllerZ = new PIDController(.2, 0, 0);
     // private final PIDController pidControllerZ = new PIDController(50, 0, 0.2);
     private PhotonPipelineResult cur = new PhotonPipelineResult();
 
     private boolean finished;
 
-    private final int tagID;
+    private double desired;
 
-    public GoToPoseCommand(CommandSwerveDrivetrain drivetrain, int tagID) {
+    // private final int tagID;
+
+    public GoToPoseCommand(CommandSwerveDrivetrain drivetrain, double dist) {
         this.drivetrain = drivetrain;
-        this.tagID = tagID;
+        this.desired = dist;
 
         finished = false;
     }
 
     @Override
     public void initialize() {
-        pidControllerX.reset();
+        // pidControllerX.reset();
         pidControllerY.reset();
 
-        pidControllerX.setTolerance(0.05);//FIXME CHECK TO SEE IF VALID
-        pidControllerY.setTolerance(0.05);
+        // pidControllerX.setTolerance(0.02);//FIXME CHECK TO SEE IF VALID
+        pidControllerY.setTolerance(
+            0.05);
     }
 
     @Override
@@ -52,9 +60,23 @@ public class GoToPoseCommand extends Command  {
         cur = drivetrain.getPhotonResult();
         // System.err.println(cur);
         if(cur != null){
-            System.err.println("++++");
             if(cur.hasTargets()){
-                for(var target : cur.getTargets()) {
+                PhotonTrackedTarget bestResult = cur.getBestTarget();
+                if(bestResult != null){
+                    System.err.println("++++");
+
+                    double curDistY = bestResult.getYaw();
+
+                        // double forward = pidControllerX.calculate(curDistX, Constants.PhotonVisionConstants.DES_HUMAN_DISTANCEX);
+                    double strafe = pidControllerY.calculate(curDistY, desired);
+                    SmartDashboard.putNumber("Strafe Auto", strafe);
+                    drivetrain.setControl(new SwerveRequest.RobotCentric()
+                        .withVelocityX(-Constants.driver.getLeftX() * MaxSpeed * 0.6) // for tag 7, robot forward = negative x
+                        .withVelocityY(strafe) // For tag 7, robot right = positive y
+                        .withRotationalRate(0));
+                }
+                // cur.get
+                // for(var target : cur.getTargets()) {
                     // if(target.getFiducialId() == 7){
                     //     System.err.println("Pose Found");
                     //     // double targetYaw = target.getYaw();
@@ -97,33 +119,40 @@ public class GoToPoseCommand extends Command  {
 
                     // If the camera to target is field relative
                     // The following works for all tags
-                    System.err.println("Target Tracked");
-                    if(target.getFiducialId() == tagID) {
-                        System.err.println("ID Found");
-                        double curDistX = target.bestCameraToTarget.getX();
-                        double curDistY = target.getYaw();
+                    // System.err.println("Target Tracked");
+                    // // if(target.)
+                    // // if(target.getFiducialId() == tagID) {
+                    //     System.err.println("ID Found");
+                        // double curDistX = target.bestCameraToTarget.getX();
+                    //     // double curDistX =
+                    //     //         PhotonUtils.calculateDistanceToTargetMeters(
+                    //     //                 .381, // Measured with a tape measure, or in CAD.
+                    //     //                 .31, // From 2024 game manual for ID 7
+                    //     //                 Units.degreesToRadians(90), // Measured with a protractor, or in CAD.
+                    //     //                 Units.degreesToRadians(target.getPitch()));
+                    //     double curDistY = bestResult.getYaw();
 
-                        double forward = pidControllerX.calculate(curDistX, Constants.PhotonVisionConstants.DES_HUMAN_DISTANCEX);
-                        double strafe = pidControllerY.calculate(curDistY, Constants.PhotonVisionConstants.DES_HUMAN_DISTANCEY);
+                    //     // double forward = pidControllerX.calculate(curDistX, Constants.PhotonVisionConstants.DES_HUMAN_DISTANCEX);
+                    //     double strafe = pidControllerY.calculate(curDistY, desired);
 
-                        // double curDistX = target.bestCameraToTarget.getX(); // assumes bestCameraToTarget is field relative
-                        // double curDistY = target.bestCameraToTarget.getY(); // assumes bestCameraToTarget is field relative
-                        // double curDistZ = target.bestCameraToTarget.getZ();
+                    //     // double curDistX = target.bestCameraToTarget.getX(); // assumes bestCameraToTarget is field relative
+                    //     // double curDistY = target.bestCameraToTarget.getY(); // assumes bestCameraToTarget is field relative
+                    //     // double curDistZ = target.bestCameraToTarget.getZ();
                         
 
-                        // double forward = pidControllerX.calculate(curDistX, Constants.PhotonVisionConstants.DES_HUMAN_DISTANCEX);
-                        // double strafe = pidControllerY.calculate(curDistY, Constants.PhotonVisionConstants.DES_HUMAN_DISTANCEY);
-                        // double rotate = pidControllerZ.calculate(curDistZ, 180);
+                    //     // double forward = pidControllerX.calculate(curDistX, Constants.PhotonVisionConstants.DES_HUMAN_DISTANCEX);
+                    //     // double strafe = pidControllerY.calculate(curDistY, Constants.PhotonVisionConstants.DES_HUMAN_DISTANCEY);
+                    //     // double rotate = pidControllerZ.calculate(curDistZ, 180);
 
-                        // System.err.println(curDistX + " " + curDistY + " " + curDistZ + " " + forward + " " + strafe + " " + rotate+ " ====");
-                        // // double rotate = pidControllerZ.calculate(curDistZ, 1)
+                    //     // System.err.println(curDistX + " " + curDistY + " " + curDistZ + " " + forward + " " + strafe + " " + rotate+ " ====");
+                    //     // // double rotate = pidControllerZ.calculate(curDistZ, 1)
 
-                        drivetrain.setControl(new SwerveRequest.FieldCentric()
-                            .withVelocityX(forward) // for tag 7, robot forward = negative x
-                            .withVelocityY(strafe) // For tag 7, robot right = positive y
-                            .withRotationalRate(0));
-                    }
-                }
+                    //     drivetrain.setControl(new SwerveRequest.FieldCentric()
+                    //         .withVelocityX(-Constants.driver.getLeftX() * MaxSpeed * 0.6) // for tag 7, robot forward = negative x
+                    //         .withVelocityY(strafe) // For tag 7, robot right = positive y
+                    //         .withRotationalRate(0));
+                    // }
+                // }
             }
         }
     }
@@ -152,6 +181,14 @@ public class GoToPoseCommand extends Command  {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void end(boolean interrupted){
+        drivetrain.setControl(new SwerveRequest.FieldCentric()
+                .withVelocityX(-Constants.driver.getLeftY() * MaxSpeed * 0.6) // Drive forward with negative Y (forward)4
+                .withVelocityY(-Constants.driver.getLeftX() * MaxSpeed * 0.6) // Drive left with negative X (left)
+                .withRotationalRate(-Constants.driver.getRightX() * MaxAngularRate * 0.6));
     }
 
 

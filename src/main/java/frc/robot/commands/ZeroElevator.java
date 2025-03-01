@@ -16,7 +16,7 @@ public class ZeroElevator extends Command{
 
     @Override
     public void execute(){
-        elevator.setVoltage(-1.5);
+        elevator.setVoltage(-1);
     }
 
     @Override
@@ -28,7 +28,7 @@ public class ZeroElevator extends Command{
     public void end(boolean interrupted){
 
         System.err.println("Elevator has zeroed");
-        
+
         elevator.setVoltage(0);
         elevator.zero();
     }

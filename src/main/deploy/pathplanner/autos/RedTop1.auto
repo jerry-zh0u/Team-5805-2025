@@ -5,15 +5,16 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "New Path"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "EJECT"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "RTopBargeToLeftCoral1"
+                }
+              }
+            ]
           }
         }
       ]

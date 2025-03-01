@@ -36,6 +36,7 @@ public class Robot extends TimedRobot {
   public void disabledExit() {
     m_robotContainer.elevator.setMode(false);
     m_robotContainer.elevator.zero();
+    m_robotContainer.climb.setZero();
   }
 
   @Override

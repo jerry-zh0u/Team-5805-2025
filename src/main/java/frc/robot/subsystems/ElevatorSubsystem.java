@@ -132,6 +132,8 @@ public class ElevatorSubsystem extends SubsystemBase{
 
         SmartDashboard.putBoolean("Limit Switch", getLimitSwitch());
 
+        // SmartDashboard.putBoolean("Zero", zero);
+
         if(limitSwitch.get()){
             if(!zeroed){
                 zeroed = true;

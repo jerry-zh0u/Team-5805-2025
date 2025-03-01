@@ -55,8 +55,6 @@ public class RobotContainer {
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
     // private final CommandPS4Controller driver = new CommandPS4Controller(0);
-    private final CommandPS4Controller opereator = new CommandPS4Controller(1);
-
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
     // public final ElevatorSubsystem elevator = new ElevatorSubsystem();
@@ -69,23 +67,28 @@ public class RobotContainer {
     private final SendableChooser<Command> autoChooser;
 
     public RobotContainer() {
-        autoChooser = AutoBuilder.buildAutoChooser();
 
-        NamedCommands.registerCommand("BASE", new ElevatorCommands(elevator, Constants.L0));
+        NamedCommands.registerCommand("BASE",new SequentialCommandGroup(
+            new ElevatorCommands(elevator, Constants.L1),
+            new ZeroElevator(elevator)
+        ));
         NamedCommands.registerCommand("L1", new ElevatorCommands(elevator, Constants.L1));
         NamedCommands.registerCommand("L2", new ElevatorCommands(elevator, Constants.L2));
         NamedCommands.registerCommand("L3", new ElevatorCommands(elevator, Constants.L3));
         NamedCommands.registerCommand("L4", new ElevatorCommands(elevator, Constants.L4));
         NamedCommands.registerCommand("EJECT", new SequentialCommandGroup(
                                                         new CoralManipulatorGo(coralManip, -1), 
-                                                        new WaitCommand(1), 
+                                                        new WaitCommand(0.25), 
                                                         new CoralManipulatorGo(coralManip, 0))
                                                     );
         // NamedCommands.registerCommand("EJECT", new AutoCoralManipulator(coralManip, -1));
 
+
         configureBindings();
         TagalongConfiguration.ffTuningMicrosystems.add("_elevator");
         // _elevator.get
+        autoChooser = AutoBuilder.buildAutoChooser();
+
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
         // coralManip.setDefaultCommand(new CoralManipulatorGo(coralManip, 0));
@@ -98,25 +101,32 @@ public class RobotContainer {
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() ->
-                drive.withVelocityX(-Constants.driver.getLeftY() * MaxSpeed * 0.6) // Drive forward with negative Y (forward)4
-                    .withVelocityY(-Constants.driver.getLeftX() * MaxSpeed * 0.6) // Drive left with negative X (left)
-                    .withRotationalRate(-Constants.driver.getRightX() * MaxAngularRate * 0.6) // Drive counterclockwise with negative X (left)
+                drive.withVelocityX(-Constants.driver.getLeftY() * MaxSpeed * 0.7) // Drive forward with negative Y (forward)4
+                    .withVelocityY(-Constants.driver.getLeftX() * MaxSpeed * 0.7) // Drive left with negative X (left)
+                    .withRotationalRate(-Constants.driver.getRightX() * MaxAngularRate * 0.75) // Drive counterclockwise with negative X (left)
             )
         );
 
         // driver.rightBumper().whileTrue(drivetrain.applyRequest(() -> drivetrain.CameraGoToTag(-driver.getLeftY() * MaxSpeed, -driver.getLeftX() * MaxSpeed, -driver.getRightX() * MaxAngularRate, drive)));
         // driver.L2().toggleOnTrue(new GoToPoseCommand(drivetrain, 7));
-        Constants.driver.L2().whileTrue(new GoToPoseCommand(drivetrain, 8));
-        Constants.driver.L1().onTrue(new ZeroElevator(elevator));
+        // Constants.driver.L2().whileTrue(new GoToPoseCommand(drivetrain, 8));
         // Constants.driver.L1().onTrue(new SequentialCommandGroup(new ElevatorCommands(elevator, 25), new WaitCommand(0.2), new ElevatorCommands(elevator, Constants.ElevatorConstants.ELEVATORBASEHEIGHT)));
         // Constants.driver.R1().
         // Constants.driver.L1().onTrue(new ElevatorCommands(elevator, 25).andThen(new WaitCommand(0.2).andThen(new ElevatorCommands(elevator, Constants.ElevatorConstants.ELEVATORBASEHEIGHT))));
-        // Constants.driver.L1().onTrue(new ElevatorCommands(elevator, Constants.L4));
-        Constants.driver.square().onTrue(new ElevatorCommands(elevator, Constants.L1));
+        // Constants.driver.L1().onTrue(new ZeroElevator(elevator));
+        Constants.operator.x().onTrue(new GoToPoseCommand(drivetrain, Constants.PhotonVisionConstants.DES_HUMAN_DISTANCE_Y_LEFT));
+        Constants.operator.b().onTrue(new GoToPoseCommand(drivetrain, Constants.PhotonVisionConstants.DES_HUMAN_DISTANCE_Y_RIGHT));
+
+        Constants.driver.L1().onTrue(new SequentialCommandGroup(
+                                            new ElevatorCommands(elevator, Constants.L1),
+                                            new ZeroElevator(elevator)
+        ).withInterruptBehavior(Command.InterruptionBehavior.kCancelSelf));
+
+        Constants.driver.square().onTrue(new ElevatorCommands(elevator, Constants.L1).withInterruptBehavior(Command.InterruptionBehavior.kCancelSelf));
         // Constants.driver.L1().onTrue(new ElevatorCommands(elevator, Constants.L1));
-        Constants.driver.cross().onTrue(new ElevatorCommands(elevator, Constants.L2));
-        Constants.driver.circle().onTrue(new ElevatorCommands(elevator, Constants.L3));
-        Constants.driver.triangle().onTrue(new ElevatorCommands(elevator, Constants.L4));
+        Constants.driver.cross().onTrue(new ElevatorCommands(elevator, Constants.L2).withInterruptBehavior(Command.InterruptionBehavior.kCancelSelf));
+        Constants.driver.circle().onTrue(new ElevatorCommands(elevator, Constants.L3).withInterruptBehavior(Command.InterruptionBehavior.kCancelSelf));
+        Constants.driver.triangle().onTrue(new ElevatorCommands(elevator, Constants.L4).withInterruptBehavior(Command.InterruptionBehavior.kCancelSelf));
         // Constants.driver.povDown().onTrue(ElevatorCommands.zeroSubsystems());
         // Constants.driver.povUp().onTrue(new InstantCommand(() -> ZeroElevator.stopZero()));
         // driver.L2().onTrue(Commands.runOnce(() -> elevator.zero(), elevator));
@@ -127,15 +137,22 @@ public class RobotContainer {
         // driver.square().onTrue(new ElevatorCommands(elevator, Constants.L3));
         // driver.L1().onTrue(new ElevatorCommands(elevator, Constants.L4));
 
-        opereator.L2().whileTrue(new ClimbCommands(climb, 1));
-        opereator.L2().whileFalse(new ClimbCommands(climb, 0));
-        opereator.L1().whileTrue(new ClimbCommands(climb, -1));
-        opereator.L1().whileFalse(new ClimbCommands(climb, 0));
+        Constants.operator.y().whileTrue(new ClimbCommands(climb, 1));
+        Constants.operator.y().whileFalse(new ClimbCommands(climb, 0));
+        Constants.operator.a().whileTrue(new ClimbCommands(climb, -1));
+        Constants.operator.a().whileFalse(new ClimbCommands(climb, 0));
+
+        // Constants.operator.rightBumper()
 
         Constants.driver.R1().whileTrue(new CoralManipulatorGo(coralManip, 0.8));
         Constants.driver.R1().whileFalse(new CoralManipulatorGo(coralManip, 0));
         Constants.driver.R2().whileTrue(new CoralManipulatorGo(coralManip, -0.8));
         Constants.driver.R2().whileFalse(new CoralManipulatorGo(coralManip, 0));
+
+        Constants.operator.leftBumper().onTrue(new SequentialCommandGroup(new ElevatorCommands(elevator, elevator.getHeight() - 2),
+                                                                            new ElevatorCommands(elevator, elevator.getHeight() + 4),
+                                                                            new ElevatorCommands(elevator, MaxAngularRate)
+        ));
 
         // driver.a().whileTrue(drivetrain.applyRequest(() -> brake));
         // driver.b().whileTrue(drivetrain.applyRequest(() ->
@@ -150,7 +167,7 @@ public class RobotContainer {
         // driver.start().and(driver.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
         // reset the field-centric heading on left bumper press
-        Constants.driver.L1().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+        Constants.operator.rightBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
         // driver.cross().onTrue(new ElevateToCmd(_elevator, ElevatorHeights.REEF_L1));
         
@@ -165,7 +182,10 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
         // return autoChooser.getSelected();
-        return new PathPlannerAuto("BlueMiddle1");
+        SmartDashboard.putString("Auto Selected", autoChooser.getSelected().getName());
+        // System.err.println(autoChooser.getSelected().getName());
+        return autoChooser.getSelected();
+        // return new PathPlannerAuto("Test");
         // return Commands.print("No autonomous command configured");
     }  
         
@@ -175,12 +195,5 @@ public class RobotContainer {
   // public void onDisable() {
   //   _elevator.onDisable();
   // }
-
-//   @Override
-//   public void teleopInit() {
-//     if (m_autonomousCommand != null) {
-//       m_autonomousCommand.cancel();
-//     }
-//   }
 }
 
