@@ -76,7 +76,7 @@ public final class Constants {
 
         public static final double ELEVATORBASEHEIGHT = 15;
         public static final double ELEVATORBASESECONDHEIGHT = 25;
-        public static final double INCHPERROTATION = (ELEVATORBASESECONDHEIGHT - ELEVATORBASEHEIGHT) / 5;
+        public static final double INCHPERROTATION = (ELEVATORBASESECONDHEIGHT - ELEVATORBASEHEIGHT) / 5.0;
 
         public static final double MAXROTATIONS = 26; // FIXME
 

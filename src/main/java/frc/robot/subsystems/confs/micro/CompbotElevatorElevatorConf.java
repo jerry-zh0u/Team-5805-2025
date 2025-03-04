@@ -36,9 +36,9 @@ public class CompbotElevatorElevatorConf extends ElevatorConf {
   public static final FeedforwardConstants feedForward = new FeedforwardConstants(0.11, 0.35, 4.5924003749, 0.0);
 
   /* -------- Positional -------- */
-  public static final PIDSGVAConstants slot0 = new PIDSGVAConstants(0.000, 0.0, 0.0, 0, 0.0, 0.0, 0.0);
+  public static final PIDSGVAConstants slot0 = new PIDSGVAConstants(0.000, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
   /* -------- Velocity -------- */
-  public static final PIDSGVAConstants slot1 = new PIDSGVAConstants(0.000, 0.0, 0.0, 0, 0.0, 0.0, 0.0);
+  public static final PIDSGVAConstants slot1 = new PIDSGVAConstants(0.000, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
   /* -------- Current -------- */
   public static final PIDSGVAConstants slot2 = new PIDSGVAConstants(0.000, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 

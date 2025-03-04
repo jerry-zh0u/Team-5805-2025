@@ -15,7 +15,7 @@ import frc.robot.commands.WaitCommand;
 import frc.robot.commands.ZeroElevator;
 import frc.robot.constants.ElevatorHeights;
 import frc.robot.subsystems.*;
-import frc.robot.subsystems.confs.CompbotElevatorConf;
+import frc.robot.subsystems.confs.TagalongElevatorSubsystemConf;
 import tagalong.TagalongConfiguration;
 import tagalong.commands.base.ElevateToCmd;
 import tagalong.subsystems.micro.Elevator;
@@ -68,7 +68,7 @@ public class RobotContainer {
     // private final CommandPS4Controller driver = new CommandPS4Controller(0);
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
-    public final ElevatorSubsystem elevator = new ElevatorSubsystem();
+    // public final ElevatorSubsystem elevator = new ElevatorSubsystem();
     // public final ElevatorSubsystem elevator = new ElevatorSubsystem();
 
     public final CoralManipulator coralManip = new CoralManipulator();
