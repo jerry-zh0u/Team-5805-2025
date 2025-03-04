@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot;
+
 import tagalong.TagalongConfiguration;
 
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -16,27 +17,33 @@ public class Robot extends TimedRobot {
 
   public Robot() {
     m_robotContainer = new RobotContainer();
+    TagalongConfiguration.ffTuningMicrosystems.add("CoralElevator");
   }
 
   @Override
   public void robotPeriodic() {
-    CommandScheduler.getInstance().run(); 
+    CommandScheduler.getInstance().run();
   }
 
   @Override
   public void disabledInit() {
-    m_robotContainer.elevator.setMode(true);
+    // m_robotContainer.elevator.setMode(true);
     // m_robotContainer.onDisable();
   }
 
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+  }
 
   @Override
   public void disabledExit() {
-    m_robotContainer.elevator.setMode(false);
+    // m_robotContainer.elevator.setMode(false);
     m_robotContainer.elevator.zero();
     m_robotContainer.climb.setZero();
+
+    // m_robotContainer.elevator.setVoltage(.05);
+    // m_robotContainer.elevator.setVoltage(-2);
+    // -0.24, -0.47
   }
 
   @Override
@@ -49,10 +56,12 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+  }
 
   @Override
-  public void autonomousExit() {}
+  public void autonomousExit() {
+  }
 
   @Override
   public void teleopInit() {
@@ -62,10 +71,12 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+  }
 
   @Override
-  public void teleopExit() {}
+  public void teleopExit() {
+  }
 
   @Override
   public void testInit() {
@@ -73,11 +84,14 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void testPeriodic() {}
+  public void testPeriodic() {
+  }
 
   @Override
-  public void testExit() {}
+  public void testExit() {
+  }
 
   @Override
-  public void simulationPeriodic() {}
+  public void simulationPeriodic() {
+  }
 }

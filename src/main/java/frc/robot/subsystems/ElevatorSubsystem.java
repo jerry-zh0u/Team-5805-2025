@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
-public class ElevatorSubsystem extends SubsystemBase{
+public class ElevatorSubsystem extends SubsystemBase {
     public static ElevatorSubsystem elevatorSubsystem;
     public TalonFX leftMotorFollower, rightMotorMaster;
 
@@ -35,96 +35,110 @@ public class ElevatorSubsystem extends SubsystemBase{
     VoltageOut voltageRequest = new VoltageOut(0);
 
     MotionMagicVoltage motionRequest;
-    
-    public ElevatorSubsystem(){
+
+    public ElevatorSubsystem() {
         // leftMotorFollower = new TalonFX(Constants.ElevatorConstants.ELEVATORLEFTID);
         rightMotorMaster = new TalonFX(Constants.ElevatorConstants.ELEVATORRIGHTID);
-        rightMotorMaster.getConfigurator().apply(Constants.ElevatorConstants.ELEVATORCONFIG);
+        leftMotorFollower = new TalonFX(Constants.ElevatorConstants.ELEVATORLEFTID);
+        // rightMotorMaster.getConfigurator().apply(Constants.ElevatorConstants.ELEVATORCONFIG);
 
-        configureFollowerMotor(Constants.ElevatorConstants.ELEVATORLEFTID, true);
+        // configureFollowerMotor(Constants.ElevatorConstants.ELEVATORLEFTID, true);
 
-        lastPos = Constants.ElevatorConstants.ELEVATORBASEHEIGHT;
-        motionRequest = new MotionMagicVoltage(0);
-        zeroed = true;
+        // lastPos = Constants.ElevatorConstants.ELEVATORBASEHEIGHT;
+        // motionRequest = new MotionMagicVoltage(0);
+        // zeroed = true;
 
         // leftmotorfollower.set(Follower, rightMotorMaster);
-        // leftMotorFollower.setControl(new Follower(rightMotorMaster.getDeviceID(), true));
+        // leftMotorFollower.setControl(new Follower(rightMotorMaster.getDeviceID(),
+        // true));
         // leftMotorFollower.getConfigurator().apply(Constants.ElevatorConstants.ELEVATORCONFIG);
 
         limitSwitch = new DigitalInput(Constants.ElevatorConstants.LIMITSWITCHID);
 
-        rightMotorMaster.getConfigurator().apply(Constants.ElevatorConstants.ELEVATORCONFIG);
-//         leftMotorFollower.getConfigurator().apply(Constants.ElevatorConstants.ELEVATORCONFIG);
+        // rightMotorMaster.getConfigurator().apply(Constants.ElevatorConstants.ELEVATORCONFIG);
+        // leftMotorFollower.getConfigurator().apply(Constants.ElevatorConstants.ELEVATORCONFIG);
 
         // onStall = 0;
     }
 
-    public void configureFollowerMotor(int followerMotorId, boolean opposeMasterDirection) {
-        leftMotorFollower = new TalonFX(followerMotorId);
-        follower = new Follower(rightMotorMaster.getDeviceID(), opposeMasterDirection);
+    // public void configureFollowerMotor(int followerMotorId, boolean
+    // opposeMasterDirection) {
+    // leftMotorFollower = new TalonFX(followerMotorId);
+    // leftMotorFollower.getConfigurator().apply(Constants.ElevatorConstants.ELEVATORCONFIG);
 
-        leftMotorFollower.setControl(follower);
-    }
+    // follower = new Follower(rightMotorMaster.getDeviceID(),
+    // opposeMasterDirection);
 
-    public void setPosition(double height){
+    // leftMotorFollower.setControl(follower);
+    // }
+
+    public void setPosition(double height) {
         lastPos = height;
 
         rightMotorMaster.setControl(motionRequest.withPosition(convertDistRotation(height)));
     }
 
-    public double getPosition(){
+    public double getPosition() {
         return rightMotorMaster.getPosition().getValueAsDouble();
     }
 
-    public double getHeight(){
-        return rightMotorMaster.getPosition().getValueAsDouble() * Constants.ElevatorConstants.INCHPERROTATION + Constants.ElevatorConstants.ELEVATORBASEHEIGHT;
+    public double getHeight() {
+        return rightMotorMaster.getPosition().getValueAsDouble() * Constants.ElevatorConstants.INCHPERROTATION
+                + Constants.ElevatorConstants.ELEVATORBASEHEIGHT;
     }
 
-    public void zero(){
+    public void zero() {
         rightMotorMaster.setPosition(0.0);
         leftMotorFollower.setPosition(0.0);
 
         setVoltage(0);
 
-        lastPos = Constants.ElevatorConstants.ELEVATORBASEHEIGHT;
+        // lastPos = Constant/s.ElevatorConstants.ELEVATORBASEHEIGHT;
         // rightMotorMaster.setControl(motionRequest.withPosition(convertDistRotation(lastPos)));
-        System.err.println("Zero Run" + " " + rightMotorMaster.getPosition().getValueAsDouble());
+        // System.err.println("Zero Run" + " " +
+        // rightMotorMaster.getPosition().getValueAsDouble());
     }
 
     // public void setVoltage(double output) {
-    //     rightMotorMaster.setVoltage(output);
+    // rightMotorMaster.setVoltage(output);
     // }
 
-    private double convertDistRotation(double height){
-        return (height - Constants.ElevatorConstants.ELEVATORBASEHEIGHT)/Constants.ElevatorConstants.INCHPERROTATION;
+    private double convertDistRotation(double height) {
+        return (height - Constants.ElevatorConstants.ELEVATORBASEHEIGHT) / Constants.ElevatorConstants.INCHPERROTATION;
     }
 
-    public void setMode(boolean coastMode){
-        if(coastMode){
+    public void setMode(boolean coastMode) {
+        if (coastMode) {
             rightMotorMaster.getConfigurator().apply(Constants.ElevatorConstants.ELEVATOR_COAST_CONFIG);
-            // leftMotorFollower.getConfigurator().apply(Constants.ElevatorConstants.ELEVATOR_COAST_CONFIG);
-        }else{
+            leftMotorFollower.getConfigurator().apply(Constants.ElevatorConstants.ELEVATOR_COAST_CONFIG);
+        } else {
             rightMotorMaster.getConfigurator().apply(Constants.ElevatorConstants.ELEVATORCONFIG);
-            // leftMotorFollower.getConfigurator().apply(Constants.ElevatorConstants.ELEVATORCONFIG);
+            leftMotorFollower.getConfigurator().apply(Constants.ElevatorConstants.ELEVATORCONFIG);
         }
     }
 
-    public void setVoltage(double amt){
-        rightMotorMaster.setControl(voltageRequest.withOutput(amt));
+    public void setVoltage(double amt) {
+        rightMotorMaster.setControl(voltageRequest.withOutput(-amt));
+        leftMotorFollower.setControl(voltageRequest.withOutput(amt));
         // leftMotorFollower.setControl(voltageRequest.withOutput(amt));
-        // leftMotorFollower.setControl(new Follower(rightMotorMaster.getDeviceID(), true));
+        // leftMotorFollower.setControl(new Follower(rightMotorMaster.getDeviceID(),
+        // true));
+    }
+
+    public void manualControl(double speed) {
+        rightMotorMaster.set(speed);
     }
 
     // public boolean atBottom(){
-    //     return onStall >= 1;
+    // return onStall >= 1;
     // }
 
-    public boolean getLimitSwitch(){
+    public boolean getLimitSwitch() {
         return limitSwitch.get();
     }
 
     @Override
-    public void periodic(){
+    public void periodic() {
         SmartDashboard.putNumber("Elevator Position", getHeight());
         SmartDashboard.putNumber("Elevator Desired Position", lastPos);
 
@@ -134,18 +148,18 @@ public class ElevatorSubsystem extends SubsystemBase{
 
         // SmartDashboard.putBoolean("Zero", zero);
 
-        if(limitSwitch.get()){
-            if(!zeroed){
+        if (limitSwitch.get()) {
+            if (!zeroed) {
                 zeroed = true;
                 zero();
             }
-        }else{
+        } else {
             zeroed = false;
         }
         // if(rightMotorMaster.getSupplyCurrent().getValueAsDouble() > 3.5){
-        //     onStall++;
+        // onStall++;
         // }else{
-        //     onStall = 0;
+        // onStall = 0;
         // }
 
         // SmartDashboard.putNumber("Stall Counter", onStall);

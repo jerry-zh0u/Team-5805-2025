@@ -1,4 +1,5 @@
 package frc.robot.subsystems;
+
 import edu.wpi.first.wpilibj.Filesystem;
 
 import tagalong.subsystems.micro.Elevator;
@@ -13,9 +14,10 @@ public class TagalongElevatorSystem extends TagalongSubsystemBase implements Ele
 
   public final ElevatorSystemConf _elevatorConf;
 
-//   /* -------- Logging: utilities and configs -------- */
-//   private final ElevatorIOTalonFX _io;
-//   private final ElevatorIOInputsAutoLogged _inputs = new ElevatorIOInputsAutoLogged();
+  // /* -------- Logging: utilities and configs -------- */
+  // private final ElevatorIOTalonFX _io;
+  // private final ElevatorIOInputsAutoLogged _inputs = new
+  // ElevatorIOInputsAutoLogged();
 
   @Override
   public Elevator getElevator() {
@@ -30,69 +32,71 @@ public class TagalongElevatorSystem extends TagalongSubsystemBase implements Ele
         return _elevator;
     }
   }
+
   public TagalongElevatorSystem(ElevatorSystemConf elevatorConf) {
     super(elevatorConf);
-    _elevator = new Elevator( elevatorConf!= null ? elevatorConf.elevatorConf : null);
-  if (_elevator._configuredMicrosystemDisable) {
+    _elevator = new Elevator(elevatorConf != null ? elevatorConf.elevatorConf : null);
+    if (_elevator._configuredMicrosystemDisable) {
       _elevatorConf = null;
       return;
     }
     _elevatorConf = elevatorConf;
- 
-  int counter = 0;
-  while (!checkInitStatus() && counter < 100) {
-    System.out.println("Waiting for Elevator");
+
+    int counter = 0;
+    while (!checkInitStatus() && counter < 100) {
+      System.out.println("Waiting for Elevator");
+    }
+
+    if (counter >= 100) {
+      System.out.println("failed to init Elevator");
+    }
+
+    configShuffleboard();
   }
 
-  if (counter >= 100) {
-    System.out.println("failed to init Elevator");
+  @Override
+  public void onEnable() {
+    if (_isSubsystemDisabled) {
+      return;
+    }
+    _elevator.onEnable();
   }
 
-  configShuffleboard();
-}
-
-  @Override 
-  public void onEnable () {
-   if (_isSubsystemDisabled) { 
-  return;
+  @Override
+  public void onDisable() {
+    if (_isSubsystemDisabled) {
+      return;
     }
-      _elevator.onEnable();
-  } 
+    _elevator.onDisable();
+  }
 
-  @Override 
-  public void onDisable () {
-   if (_isSubsystemDisabled) { 
-  return;
+  @Override
+  public void periodic() {
+    if (_isSubsystemDisabled) {
+      return;
     }
-      _elevator.onDisable();
-  } 
-
-  @Override 
-  public void periodic () {
-   if (_isSubsystemDisabled) { 
-  return;
-    }
-      _elevator.periodic();
+    _elevator.periodic();
     updateShuffleboard();
-  } 
+  }
 
- public void simulationInit (){
-      _elevator.simulationInit();
-  } 
+  public void simulationInit() {
+    _elevator.simulationInit();
+  }
 
- public void simulationPeriodic (){
-      _elevator.simulationPeriodic();
-  } 
+  public void simulationPeriodic() {
+    _elevator.simulationPeriodic();
+  }
 
- public void updateShuffleboard (){
-      _elevator.updateShuffleboard();
-  } 
+  public void updateShuffleboard() {
+    _elevator.updateShuffleboard();
+  }
 
- public void configShuffleboard (){
-      _elevator.configShuffleboard();
-  } 
+  public void configShuffleboard() {
+    _elevator.configShuffleboard();
+  }
 
-public boolean checkInitStatus() {
-  return  _elevator.checkInitStatus();} 
+  public boolean checkInitStatus() {
+    return _elevator.checkInitStatus();
+  }
 
 }

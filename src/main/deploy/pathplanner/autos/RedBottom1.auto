@@ -17,7 +17,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "L4"
+                  "name": "L2"
                 }
               }
             ]
@@ -51,7 +51,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.5
+            "waitTime": 0.75
           }
         },
         {
@@ -101,7 +101,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.5
+            "waitTime": 0.75
           }
         },
         {
@@ -130,9 +130,22 @@
           }
         },
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "BASE"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "BottomCoralRight3ToHuman"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "BASE"
+                }
+              }
+            ]
           }
         }
       ]

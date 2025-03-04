@@ -4,13 +4,14 @@ import tagalong.subsystems.micro.confs.ElevatorConf;
 import frc.robot.subsystems.confs.micro.CompbotElevatorElevatorConf;
 
 public class CompbotElevatorConf extends ElevatorSystemConf {
-    public static final ElevatorConf elevatorConf = CompbotElevatorElevatorConf.construct();
+  public static final ElevatorConf elevatorConf = CompbotElevatorElevatorConf.construct();
 
-    public static CompbotElevatorConf construct() {
-        return new CompbotElevatorConf (elevatorConf);
-    }
+  public static CompbotElevatorConf construct() {
+    return new CompbotElevatorConf(elevatorConf);
+  }
 
-    public CompbotElevatorConf(ElevatorConf elevatorConf) {
-      super(elevatorConf);
-    }
+  public CompbotElevatorConf(ElevatorConf elevatorConf) {
+    super(elevatorConf);
+  }
+
 }
