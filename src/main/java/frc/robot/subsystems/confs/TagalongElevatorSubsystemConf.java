@@ -12,6 +12,7 @@ public class TagalongElevatorSubsystemConf extends ElevatorSystemConf {
 
   public TagalongElevatorSubsystemConf(ElevatorConf elevatorConf) {
     super(elevatorConf);
-  }
 
+    // elevatorConf.get
+  }
 }

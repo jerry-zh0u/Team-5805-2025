@@ -5,31 +5,32 @@ import static edu.wpi.first.units.Units.Inches;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
-import frc.robot.subsystems.ElevatorSubsystem;
+// import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.TagalongElevatorSystem;
+import tagalong.subsystems.micro.Elevator;
 
-public class ZeroElevator extends Command{
-    private ElevatorSubsystem elevator;
+public class ZeroElevator extends Command {
+    private TagalongElevatorSystem elevator;
 
-    public ZeroElevator(ElevatorSubsystem _elevator){
+    public ZeroElevator(TagalongElevatorSystem _elevator) {
         this.elevator = _elevator;
     }
 
     @Override
-    public void execute(){
-        elevator.setVoltage(-0.5);
+    public void execute() {
+        elevator.setPower(0.0);
     }
 
     @Override
-    public boolean isFinished(){
+    public boolean isFinished() {
         return elevator.getLimitSwitch();
     }
 
     @Override
-    public void end(boolean interrupted){
+    public void end(boolean interrupted) {
 
         System.err.println("Elevator has zeroed");
 
-        elevator.setVoltage(0);
         elevator.zero();
     }
 }

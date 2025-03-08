@@ -6,6 +6,7 @@ public enum RobotVersions {
   COMPBOT(TagalongElevatorSubsystemConf.construct());
 
   public final TagalongElevatorSubsystemConf elevatorConf;
+
   RobotVersions(TagalongElevatorSubsystemConf elevatorConf) {
     this.elevatorConf = elevatorConf;
   }

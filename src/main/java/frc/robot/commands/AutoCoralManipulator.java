@@ -10,19 +10,19 @@ public class AutoCoralManipulator extends Command {
     private WaitCommand wait;
     private double speed;
 
-    public AutoCoralManipulator(CoralManipulator _coral, double _speed){
+    public AutoCoralManipulator(CoralManipulator _coral, double _speed) {
         this.coral = _coral;
         speed = _speed;
-        wait = new WaitCommand(0.5);
+        wait = new WaitCommand(0.3);
     }
 
     @Override
-    public void execute(){
+    public void execute() {
         coral.setSpeed(speed);
     }
 
     @Override
-    public boolean isFinished(){
+    public boolean isFinished() {
         return wait.isFinished();
-    } 
+    }
 }

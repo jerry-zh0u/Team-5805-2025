@@ -7,6 +7,7 @@ package frc.robot;
 import tagalong.TagalongConfiguration;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -23,6 +24,8 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
+    SmartDashboard.putNumber("Elevator Height in Meters",
+        m_robotContainer._elevator.getElevator().getElevatorHeightM());
   }
 
   @Override
@@ -39,6 +42,8 @@ public class Robot extends TimedRobot {
   public void disabledExit() {
     // m_robotContainer.elevator.setMode(false);
     // m_robotContainer.elevator.zero();
+    // m_robotContainer._elevator.getElevator().
+    // m_robotContainer._elevator.getElevator().getPrimaryMotor().setPosition(0);
     m_robotContainer.climb.setZero();
 
     // m_robotContainer.elevator.setVoltage(.05);
@@ -72,6 +77,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
+
   }
 
   @Override

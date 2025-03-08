@@ -47,10 +47,10 @@ public final class Constants {
         public static PhotonCamera m_Camera = new PhotonCamera("logitech");
 
         // DESIRED CONSTANTS IN METERS FIXME
-        public static final double DES_REEF_DISTANCE = 0.05;
+        public static final double DES_REEF_DISTANCE = 0.381;
         // public static final double DES_HUMAN_DISTANCEX = 0.381;
-        public static final double DES_HUMAN_DISTANCE_Y_LEFT = -0.2;
-        public static final double DES_HUMAN_DISTANCE_Y_RIGHT = 0.2;
+        public static final double DES_HUMAN_DISTANCE_Y_LEFT = 0.35;
+        public static final double DES_HUMAN_DISTANCE_Y_RIGHT = -0.01;
 
         public static final double DES_ANGLE = 0;
 
