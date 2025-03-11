@@ -11,6 +11,7 @@ import frc.robot.commands.CoralManipulatorGo;
 // import frc.robot.commands.ElevatorCommands;
 // import frc.robot.commands.ZeroElevator;
 import frc.robot.commands.GoToPoseCommand;
+import frc.robot.commands.HuenemeElevatorZeroCmd;
 import frc.robot.commands.WaitCommand;
 import frc.robot.commands.ZeroElevator;
 // import frc.robot.commands.ZeroElevator;
@@ -89,18 +90,16 @@ public class RobotContainer {
                 // Constants.curRobot.elevatorConf.elevatorConf.prim
                 // _elevator.
 
-                // NamedCommands.registerCommand("BASE", new SequentialCommandGroup(
+                // NamedCommands.registerCommand("BASE", new SequentialCommasndGroup(
                 // new ElevateToCmd(_elevator, ElevatorHeights.),
                 // new ZeroElevator(elevator)));
 
-                NamedCommands.registerCommand("BASE", new ConditionalCommand(new ElevateToCmd(_elevator,
-                                ElevatorHeights.BASE, true, .5),
-                                Commands.sequence(new ElevateToCmd<>(_elevator,
-                                                ElevatorHeights.REEF_L1, true, .5),
-                                                new ElevateToCmd<>(_elevator,
-                                                                ElevatorHeights.BASE, true, .5)),
-                                () -> _elevator.getElevator().getElevatorHeightM() > ElevatorHeights.REEF_L3
-                                                .getHeightM()));
+                // NamedCommands.registerCommand("AUTOALIGN",
+                // new GoToPoseCommand(drivetrain,
+                // Constants.PhotonVisionConstants.DES_HUMAN_DISTANCE_Y_RIGHT)
+                // .withTimeout(5));
+
+                NamedCommands.registerCommand("BASE", _elevator.moveWithZero());
                 NamedCommands.registerCommand("L1", new ElevateToCmd(_elevator,
                                 ElevatorHeights.REEF_L1));
                 NamedCommands.registerCommand("L2", new ElevateToCmd(_elevator,
@@ -145,25 +144,25 @@ public class RobotContainer {
                 drivetrain.setDefaultCommand(
                                 // Drivetrain will execute this command periodically
                                 drivetrain.applyRequest(() -> drive
-                                                .withVelocityX(-Constants.driver.getLeftY() * MaxSpeed * 0.7) // Drive
-                                                                                                              // forward
-                                                                                                              // with
-                                                                                                              // negative
-                                                                                                              // Y
-                                                                                                              // (forward)4
-                                                .withVelocityY(-Constants.driver.getLeftX() * MaxSpeed * 0.7) // Drive
-                                                                                                              // left
-                                                                                                              // with
-                                                                                                              // negative
-                                                                                                              // X
-                                                                                                              // (left)
+                                                .withVelocityX(-Constants.driver.getLeftY() * MaxSpeed) // Drive
+                                                                                                        // forward
+                                                                                                        // with
+                                                                                                        // negative
+                                                                                                        // Y
+                                                                                                        // (forward)4
+                                                .withVelocityY(-Constants.driver.getLeftX() * MaxSpeed) // Drive
+                                                                                                        // left
+                                                                                                        // with
+                                                                                                        // negative
+                                                                                                        // X
+                                                                                                        // (left)
                                                 .withRotationalRate(
-                                                                -Constants.driver.getRightX() * MaxAngularRate * 0.75) // Drive
-                                                                                                                       // counterclockwise
-                                                                                                                       // with
-                                                                                                                       // negative
-                                                                                                                       // X
-                                                                                                                       // (left)
+                                                                -Constants.driver.getRightX() * MaxAngularRate) // Drive
+                                                                                                                // counterclockwise
+                                                                                                                // with
+                                                                                                                // negative
+                                                                                                                // X
+                                                                                                                // (left)
                                 ));
 
                 // driver.rightBumper().whileTrue(drivetrain.applyRequest(() ->
@@ -179,47 +178,43 @@ public class RobotContainer {
                 // WaitCommand(0.2).andThen(new ElevatorCommands(elevator,
                 // Constants.ElevatorConstants.ELEVATORBASEHEI+GHT))));
                 // Constants.driver.L1().onTrue(new ZeroElevator(elevator));
-                Constants.operator.b()
+                Constants.driver.povRight()
                                 .onTrue(new GoToPoseCommand(drivetrain,
                                                 Constants.PhotonVisionConstants.DES_HUMAN_DISTANCE_Y_LEFT)
-                                                .withTimeout(3));
-                Constants.operator.x()
+                                                .withTimeout(2));
+                Constants.driver.povLeft()
                                 .onTrue(new GoToPoseCommand(drivetrain,
                                                 Constants.PhotonVisionConstants.DES_HUMAN_DISTANCE_Y_RIGHT)
-                                                .withTimeout(3));
+                                                .withTimeout(2));
 
                 Constants.driver.square().onTrue(new ConditionalCommand(
-                                new ElevateToCmd(_elevator, ElevatorHeights.REEF_L1, true, 1),
+                                new ElevateToCmd(_elevator, ElevatorHeights.REEF_L1, true, 1.5),
                                 new ElevateToCmd(_elevator, ElevatorHeights.REEF_L1, true, 0.5),
                                 () -> _elevator.getElevator().getElevatorHeightM() < ElevatorHeights.REEF_L1
                                                 .getHeightM()));
 
                 Constants.driver.cross().onTrue(new ConditionalCommand(
-                                new ElevateToCmd(_elevator, ElevatorHeights.REEF_L2, true, 1),
+                                new ElevateToCmd(_elevator, ElevatorHeights.REEF_L2, true, 1.5),
                                 new ElevateToCmd(_elevator, ElevatorHeights.REEF_L2, true, 0.5),
                                 () -> _elevator.getElevator().getElevatorHeightM() < ElevatorHeights.REEF_L2
                                                 .getHeightM()));
 
                 Constants.driver.circle().onTrue(new ConditionalCommand(
-                                new ElevateToCmd(_elevator, ElevatorHeights.REEF_L3, true, 1),
+                                new ElevateToCmd(_elevator, ElevatorHeights.REEF_L3, true, 1.5),
                                 new ElevateToCmd(_elevator, ElevatorHeights.REEF_L3, true, 0.5),
                                 () -> _elevator.getElevator().getElevatorHeightM() < ElevatorHeights.REEF_L3
                                                 .getHeightM()));
 
                 Constants.driver.triangle().onTrue(new ConditionalCommand(
-                                new ElevateToCmd(_elevator, ElevatorHeights.REEF_L4, true, 1),
+                                new ElevateToCmd(_elevator, ElevatorHeights.REEF_L4, true, 1.5),
                                 new ElevateToCmd(_elevator, ElevatorHeights.REEF_L4, true, 0.5),
                                 () -> _elevator.getElevator().getElevatorHeightM() < ElevatorHeights.REEF_L4
                                                 .getHeightM()));
 
-                Constants.driver.L1().onTrue(new ConditionalCommand(new ElevateToCmd(_elevator,
-                                ElevatorHeights.BASE, true, .5),
-                                Commands.sequence(new ElevateToCmd<>(_elevator,
-                                                ElevatorHeights.REEF_L1, true, .5),
-                                                new ElevateToCmd<>(_elevator,
-                                                                ElevatorHeights.BASE, true, .5)),
-                                () -> _elevator.getElevator().getElevatorHeightM() > ElevatorHeights.REEF_L3
-                                                .getHeightM()));
+                Constants.driver.L1().onTrue(_elevator.moveWithZero());
+                // Commands.sequence(
+                // new ElevateToCmd<>(_elevator,
+                // ElevatorHeights.BASE, true, .5)));
 
                 // Constants.driver.L1().onTrue(new SequentialCommandGroup(
                 // new ElevateToCmd(_elevator, ElevatorHeights.REEF_L1, false, 0.5),
@@ -307,12 +302,15 @@ public class RobotContainer {
                 // reset the field-centric heading on left bumper press
                 Constants.operator.rightBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
+                // Constants.operator.leftTrigger().onTrue(new
+                // HuenemeElevatorZeroCmd(_elevator));
+
                 // driver.cross().onTrue(new ElevateToCmd(_elevator, ElevatorHeights.REEF_L1));
 
                 // driver.cross().onTrue(new ElevateToCmd(_elevator, ElevatorHeights.REEF_L1));
                 // sequential command group OR andThen()
                 // parallel command group OR alongWith()
-                // parallel race group OR raceWith()
+                // parallel race group OR raceWith
                 // parallel deadline group OR deadlineWith()
 
                 drivetrain.registerTelemetry(logger::telemeterize);

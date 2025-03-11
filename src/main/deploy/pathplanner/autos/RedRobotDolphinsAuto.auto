@@ -7,31 +7,13 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 8.0
+            "waitTime": 1.0
           }
         },
         {
           "type": "path",
           "data": {
             "pathName": "New Path Red"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "L4"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "EJECT"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "BASE"
           }
         }
       ]

@@ -50,7 +50,7 @@ public final class Constants {
         public static final double DES_REEF_DISTANCE = 0.381;
         // public static final double DES_HUMAN_DISTANCEX = 0.381;
         public static final double DES_HUMAN_DISTANCE_Y_LEFT = 0.35;
-        public static final double DES_HUMAN_DISTANCE_Y_RIGHT = -0.01;
+        public static final double DES_HUMAN_DISTANCE_Y_RIGHT = -0.03;
 
         public static final double DES_ANGLE = 0;
 

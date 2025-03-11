@@ -6,6 +6,8 @@ package frc.robot;
 
 import tagalong.TagalongConfiguration;
 
+import com.ctre.phoenix6.controls.VelocityVoltage;
+
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -46,8 +48,16 @@ public class Robot extends TimedRobot {
     // m_robotContainer._elevator.getElevator().getPrimaryMotor().setPosition(0);
     m_robotContainer.climb.setZero();
 
+    // m_robotContainer._elevator.setPower();// v_min = 0.015 v_max = .04
+
+    // m_robotContainer._elevator.setPower(0.018);
+
+    // m_robotContainer._elevator.setPower(0.1);
     // m_robotContainer.elevator.setVoltage(.05);
     // m_robotContainer.elevator.setVoltage(-2);
+
+    // m_robotContainer._elevator.getElevator().getPrimaryMotor().setControl(new
+    // VelocityVoltage(0).withFeedForward(1.04));
     // -0.24, -0.47
   }
 

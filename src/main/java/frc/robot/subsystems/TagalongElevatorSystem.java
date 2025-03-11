@@ -1,13 +1,20 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.controls.VelocityVoltage;
+
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import tagalong.subsystems.micro.Elevator;
 import tagalong.subsystems.micro.augments.ElevatorAugment;
 import frc.robot.Constants;
+import frc.robot.commands.HuenemeElevatorZeroCmd;
 import frc.robot.constants.ElevatorHeights;
 import frc.robot.subsystems.confs.ElevatorSystemConf;
+import tagalong.commands.base.ElevateToCmd;
+import tagalong.commands.base.ElevatorZeroCmd;
 import tagalong.subsystems.TagalongSubsystemBase;
 
 public class TagalongElevatorSystem extends TagalongSubsystemBase implements ElevatorAugment {
@@ -19,6 +26,8 @@ public class TagalongElevatorSystem extends TagalongSubsystemBase implements Ele
 
   private DigitalInput limitSwitch;
   private boolean zeroed;
+
+  private int stallCounter = 0;
 
   // /* -------- Logging: utilities and configs -------- */
   // private final ElevatorIOTalonFX _io;
@@ -115,6 +124,9 @@ public class TagalongElevatorSystem extends TagalongSubsystemBase implements Ele
     }
     _elevator.periodic();
     updateShuffleboard();
+    // _elevator.setHoldPosition(false);
+    // _elevator.getPrimaryMotor().setControl(new
+    // VelocityVoltage(0.0).withFeedForward(-0.2));
   }
 
   public void setPower(double amt) {
@@ -146,4 +158,9 @@ public class TagalongElevatorSystem extends TagalongSubsystemBase implements Ele
     return _elevator.checkInitStatus();
   }
 
+  public Command moveWithZero() {
+    return Commands.sequence(new ElevateToCmd(this, ElevatorHeights.BASE))
+        .until(() -> _elevator.getPrimaryMotor().getSupplyCurrent().getValueAsDouble() > 40.00)
+        .andThen(new HuenemeElevatorZeroCmd(this));
+  }
 }

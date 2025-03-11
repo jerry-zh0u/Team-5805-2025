@@ -28,7 +28,7 @@ public class GoToPoseCommand extends Command {
     private final CommandSwerveDrivetrain drivetrain;
     // private final PIDController pidControllerX = new PIDController(10, 0, 0); //
     // TODO tune
-    private final PIDController pidControllerY = new PIDController(0.9, 0, 0); // TODO tune
+    private final PIDController pidControllerY = new PIDController(5, 0, 0.4); // TODO tune
     // private final PIDController pidControllerZ = new PIDController(.2, 0, 0);
     // private final PIDController pidControllerZ = new PIDController(50, 0, 0.2);
     private PhotonPipelineResult cur = new PhotonPipelineResult();
@@ -55,7 +55,7 @@ public class GoToPoseCommand extends Command {
 
         // pidControllerX.setTolerance(0.02);//FIXME CHECK TO SEE IF VALID
         pidControllerY.setTolerance(
-                0.01);
+                0.005);
     }
 
     @Override
